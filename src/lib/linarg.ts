@@ -1,7 +1,18 @@
+/**
+ * 
+ * @param vec input vector
+ * @returns minimum value in vec
+ */
+
 export function vecFindMin(vec: number[]) {
     return vec.reduce((lowest, current) => lowest > current ? current : lowest, Infinity);
 }
 
+/**
+ * 
+ * @param vec input vector
+ * @returns Shifted vector. Makes deep copy. ex) [1, 2, 3] => [3, 1, 2]. 
+ */
 export function vecShiftToLast(vec: number[]): number[] {
     if (vec.length <= 1) {
         return vec;
@@ -11,15 +22,31 @@ export function vecShiftToLast(vec: number[]): number[] {
     return copied
 }
 
+/**
+ * 
+ * @param mat input matrix
+ * @returns Row-wise shifted matrix. Makes deep copy.
+ */
 export function matShiftToLast(mat: number[][]): number[][] {
     return mat.map((row) => vecShiftToLast(row));
 }
 
+/**
+ * 
+ * @param vec input vector
+ * @returns normalized vector such that sum(vector) = 1.
+ */
 export function vecNormalize(vec: number[]): number[] {
     const sum = vec.reduce((accum, item) => accum + item, 0);
     return vec.map(x => x/sum);
 }
 
+/**
+ * 
+ * @param mat input matrix
+ * @param colIdx column index to slice
+ * @returns sliced vector.
+ */
 export function matSliceCol(mat: number[][], colIdx: number): number[] {
     return mat.reduce((accum, row) => accum.concat(row[colIdx]), []);
 }

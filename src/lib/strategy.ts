@@ -20,10 +20,10 @@ export function getChooseProb(loseProb: number[], {absTol=10e-5}: {target?: numb
 
 /**
  * 
- * @param numPlayer 
- * @param maxCount 
- * @param numEnd 
- * @returns
+ * @param numPlayer Number of players
+ * @param maxCount Maximam number of numbers player can call on his turn.
+ * @param numEnd Final number of the game.
+ * @returns ((numEnd + 1) x (numPlayer)) matrix. 
  */
 export function getLoseProbMat(numPlayer: number, maxCount: number, numEnd: number): number[][] {
     return [[]];
