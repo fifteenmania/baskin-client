@@ -1,6 +1,6 @@
 import { Box, Divider, TextField } from "@mui/material";
 import { useState } from "react"
-import { handleNumberStateChange } from "../../lib/reactUtil";
+import { handleNumberStateChange } from "../common/reactUtil";
 
 function Calculator() {
     const [numPlayer, setNumPlayer] = useState(3);

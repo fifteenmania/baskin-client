@@ -3,7 +3,6 @@
  * @param vec input vector
  * @returns minimum value in vec
  */
-
 export function vecFindMin(vec: number[]) {
     return vec.reduce((lowest, current) => lowest > current ? current : lowest, Infinity);
 }
