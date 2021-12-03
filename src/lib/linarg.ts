@@ -3,8 +3,14 @@
  * @param vec input vector
  * @returns minimum value in vec
  */
-export function vecFindMin(vec: number[]) {
+export function vecFindMin(vec: number[]): number {
     return vec.reduce((lowest, current) => lowest > current ? current : lowest, Infinity);
+}
+
+export function getUnitVec(len: number): number[] {
+    const result = Array(len).fill(0);
+    result[0] = 1;
+    return result;
 }
 
 /**
@@ -38,6 +44,20 @@ export function matShiftToLast(mat: number[][]): number[][] {
 export function vecNormalize(vec: number[]): number[] {
     const sum = vec.reduce((accum, item) => accum + item, 0);
     return vec.map(x => x/sum);
+}
+
+/**
+ * 
+ * @param revArr reversed array
+ * @param startRow slice starting row index
+ * @param endRow slice ending row index
+ * @returns Slice reversed array as if it is normal. 
+ *      (noraml array).slice(startRow, endRow).reverse() = sliceRev((reversed array), startRow, endRow)
+ */
+export function sliceRev<T>(revArr: T[], startRow: number, endRow: number): T[] {
+    const newStartRow = revArr.length - endRow;
+    const newEndRow = revArr.length - startRow;
+    return revArr.slice(newStartRow, newEndRow);
 }
 
 /**

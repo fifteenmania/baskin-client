@@ -27,3 +27,12 @@ export function randomSampleOne(vec: number[]): number {
     const pickedIdx = getRandomInt(0, vec.length);
     return vec[pickedIdx];
 }
+
+/**
+ * 
+ * @param len length of the array
+ * @returns (len) of array filled with random number
+ */
+export function randomArray(len: number): number[] {
+    return Array.from(Array(len)).map((_) => Math.random());
+}
