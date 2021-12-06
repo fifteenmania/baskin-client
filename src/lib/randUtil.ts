@@ -2,7 +2,7 @@
  * 
  * @param min Min value.
  * @param max Max value. Excluded.
- * @returns Random float in interval [min, max) 
+ * @returns Random float in interval [`min`, `max`) 
  */
 export function getRandom(min: number, max: number): number {
     return Math.random()*(max-min) + min;
@@ -12,7 +12,7 @@ export function getRandom(min: number, max: number): number {
  * 
  * @param min Min value.
  * @param max Max value. Excluded.
- * @returns Random integer in interval [min, max).
+ * @returns Random integer in interval [`min`, `max`).
  */
 export function getRandomInt(min: number, max: number): number {
     return Math.floor(getRandom(Math.ceil(min), Math.floor(max)));
@@ -31,7 +31,7 @@ export function randomSampleOne(vec: number[]): number {
 /**
  * 
  * @param len length of the array
- * @returns (len) of array filled with random number
+ * @returns `len` of array filled with random number
  */
 export function randomArray(len: number): number[] {
     return Array.from(Array(len)).map((_) => Math.random());

@@ -1,4 +1,4 @@
-import { getChooseProb, getLoseVec } from "../strategy"
+import { getChooseProb, getFullLoseProbMat, getLoseVec } from "../strategy"
 
 describe("getChooseProb", () => {
     it("[1] => [1]", () => {
@@ -40,6 +40,13 @@ describe("getLoseVec", () => {
     it("", () => {
         expect(getLoseVec([[1, 0], [0, 1], [0.5, 0.5], [0, 1], [1, 0]], 2, 1)).toEqual([0.5, 0])
     })
+})
+
+describe("getFullLoseProbVec", () => {
+    it("", () => {
+        expect(getFullLoseProbMat(2, 2, 1)).toEqual([[1, 0], [0, 1]])
+    })
+    
 })
 
 export {}

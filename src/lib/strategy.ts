@@ -24,7 +24,15 @@ export function getChooseProb(loseVec: number[], {absTol=10e-5}: {absTol?: numbe
     return result;
 }
 
-
+/**
+ * 
+ * @param loseMat 
+ * @param maxCall 
+ * @param currentNum 
+ * @param options
+ * @param options.vecModifier Apply modifier to lose rate vector. For setting kill target, improving player win rate, etc.
+ * @returns (Modified) Lose rate vector regarding `loseMat`. 
+ */
 export function getLoseVec(loseMat: number[][], maxCall: number, currentNum: number, {vecModifier, matRev=false}: StrategyOption = {}): number[] {
     const startRow = currentNum;
     const endRow = Math.min(loseMat.length, currentNum+maxCall);
@@ -47,7 +55,7 @@ export function getNextLoseVec(loseMat: number[][], chooseProb: number[], curren
  * @param numPlayer Number of players
  * @param maxCount Maximam number of numbers player can call on his turn.
  * @param numEnd Final number of the game.
- * @returns ((numEnd + 1) x (numPlayer)) matrix. 
+ * @returns ((`numEnd` + 1) x (`numPlayer`)) lose probability matrix. 
  */
 export function getFullLoseProbMat(numPlayer: number, maxCall: number, numEnd: number, {}: StrategyOption = {}): number[][] {
     const loseMat = [];
