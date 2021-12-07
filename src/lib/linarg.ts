@@ -1,16 +1,30 @@
 /**
  * 
  * @param vec input vector
- * @returns minimum value in vec
+ * @returns minimum value of `vec`
  */
 export function vecFindMin(vec: number[]): number {
     return vec.reduce((lowest, current) => lowest > current ? current : lowest, Infinity);
 }
 
+/**
+ * 
+ * @param len length of the output vector
+ * @returns unit vector of length `len`. [1, 0, 0, ..., 0]
+ */
 export function getUnitVec(len: number): number[] {
     const result = Array(len).fill(0);
     result[0] = 1;
     return result;
+}
+
+/**
+ * 
+ * @param vec input vector
+ * @returns cumulative sum of `vec`. ex) [1, 2, 3] => [1, 3, 6]
+ */
+export function vecCumSum(vec: number[]): number[] {
+    return vec.map((sum => value => sum += value)(0));
 }
 
 /**
@@ -102,6 +116,6 @@ export function matVecDot(mat: number[][], vec: number[]): number[] {
 }
 
 // debug
-export function matToString(mat: number[][]) {
+export function matToString(mat: number[][]): string {
     return "[" + mat.map((x) => x.join(", ")).join("] [") + "]"
 }

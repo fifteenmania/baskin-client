@@ -1,3 +1,5 @@
+import { vecCumSum } from "./linarg";
+
 /**
  * 
  * @param min Min value.
@@ -26,6 +28,28 @@ export function getRandomInt(min: number, max: number): number {
 export function randomSampleOne(vec: number[]): number {
     const pickedIdx = getRandomInt(0, vec.length);
     return vec[pickedIdx];
+}
+
+/**
+ * 
+ * @param chooseProb normalized vector of choose probability
+ * @returns random sample of index rate proportional to `vec`
+ */
+export function getRandomIntAsVec(chooseProb: number[]): number {
+    const cumsum = vecCumSum(chooseProb);
+    const rand = Math.random();
+    var i = 0;
+    var lower = 0;
+    var upper = cumsum[i];
+    while (i < cumsum.length) {
+        if (rand >= lower && rand < upper) {
+            return i;
+        }
+        i++;
+        lower = cumsum[i-1];
+        upper = cumsum[i];
+    }
+    throw new Error("invalid parameters");
 }
 
 /**

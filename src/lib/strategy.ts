@@ -34,20 +34,13 @@ export function getChooseProb(loseVec: number[], {absTol=10e-5}: {absTol?: numbe
  * @returns (Modified) Lose rate vector regarding `loseMat`. 
  */
 export function getLoseVec(loseMat: number[][], maxCall: number, currentNum: number, {vecModifier, matRev=false}: StrategyOption = {}): number[] {
-    const startRow = currentNum;
-    const endRow = Math.min(loseMat.length, currentNum+maxCall);
-    const lookupMat = matRev? loseMat.slice(startRow, endRow): sliceRev(loseMat, startRow, endRow);
-    if (vecModifier !== undefined) {
-        const loseVec = lookupMat.map((loseMatRow) => vecModifier(loseMatRow));
-        return loseVec
-    } else {
-        const loseVec = lookupMat.map((loseMatRow) => loseMatRow[0]);
-        return loseVec;
-    }
-}
-
-export function getNextLoseVec(loseMat: number[][], chooseProb: number[], currentNum: number): number[] {
-    return []
+    const startRow = currentNum+1;
+    const endRow = Math.min(loseMat.length, currentNum+maxCall+1);
+    const lookupMat = matRev? sliceRev(loseMat, startRow, endRow): loseMat.slice(startRow, endRow);
+    const loseVec = (vecModifier!==undefined) ? 
+            lookupMat.map((loseMatRow) => vecModifier(loseMatRow)) : 
+            lookupMat.map((loseMatRow) => loseMatRow[0]);
+    return loseVec
 }
 
 /**
@@ -64,8 +57,7 @@ export function getFullLoseProbMat(numPlayer: number, maxCall: number, numEnd: n
     for (var currentNum=numEnd; currentNum>=0; currentNum--) {
         const loseVec = getLoseVec(loseMat, maxCall, currentNum, {vecModifier: nextTurnLoseRate, matRev: true});
         const chooseProb = getChooseProb(loseVec);
-        const nextLoseVec = getNextLoseVec(loseMat, chooseProb, currentNum);
-        loseMat.push(nextLoseVec);
+        
     }
     return loseMat;
 }
