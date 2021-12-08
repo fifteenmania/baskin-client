@@ -1,5 +1,5 @@
-import { getUnitVec, sliceRev, vecFindMin, vecNormalize } from "./linarg";
-import { nextTurnLoseRate, VecModifier } from "./modifier";
+import { getUnitVec, matShiftToLast, sliceRev, vecFindMin, vecMatDot, vecNormalize, vecVecDot } from "./linarg";
+import { defaultLoseRate, nextTurnLoseRate, VecModifier } from "./modifier";
 
 export interface StrategyOption {
     vecModifier?: VecModifier,
@@ -24,6 +24,13 @@ export function getChooseProb(loseVec: number[], {absTol=10e-5}: {absTol?: numbe
     return result;
 }
 
+export function getLookupMat(loseMat: number[][], maxCall: number, currentNum: number, {matRev=false}: {matRev: boolean}) {
+    const startRow = currentNum+1;
+    const endRow = Math.min(loseMat.length, currentNum+maxCall+1);
+    const lookupMat = matRev? sliceRev(loseMat, startRow, endRow): loseMat.slice(startRow, endRow);
+    return lookupMat;
+}
+
 /**
  * 
  * @param loseMat 
@@ -33,13 +40,9 @@ export function getChooseProb(loseVec: number[], {absTol=10e-5}: {absTol?: numbe
  * @param options.vecModifier Apply modifier to lose rate vector. For setting kill target, improving player win rate, etc.
  * @returns (Modified) Lose rate vector regarding `loseMat`. 
  */
-export function getLoseVec(loseMat: number[][], maxCall: number, currentNum: number, {vecModifier, matRev=false}: StrategyOption = {}): number[] {
-    const startRow = currentNum+1;
-    const endRow = Math.min(loseMat.length, currentNum+maxCall+1);
-    const lookupMat = matRev? sliceRev(loseMat, startRow, endRow): loseMat.slice(startRow, endRow);
-    const loseVec = (vecModifier!==undefined) ? 
-            lookupMat.map((loseMatRow) => vecModifier(loseMatRow)) : 
-            lookupMat.map((loseMatRow) => loseMatRow[0]);
+export function getLoseVec(loseMat: number[][], maxCall: number, currentNum: number, {vecModifier=defaultLoseRate, matRev=false}: StrategyOption = {}): number[] {
+    const lookupMat = getLookupMat(loseMat, maxCall, currentNum, {matRev: matRev})
+    const loseVec = lookupMat.map((loseMatRow) => vecModifier(loseMatRow)) 
     return loseVec
 }
 
@@ -55,9 +58,12 @@ export function getFullLoseProbMat(numPlayer: number, maxCall: number, numEnd: n
     const initial = getUnitVec(numPlayer);
     loseMat.push(initial);
     for (var currentNum=numEnd; currentNum>=0; currentNum--) {
-        const loseVec = getLoseVec(loseMat, maxCall, currentNum, {vecModifier: nextTurnLoseRate, matRev: true});
+        const loseVec = getLoseVec(loseMat, maxCall, currentNum, {vecModifier: defaultLoseRate, matRev: true});
         const chooseProb = getChooseProb(loseVec);
-        
+        const lookupMat = getLookupMat(loseMat, maxCall, currentNum, {matRev: true});
+        const lookupMatShifted = matShiftToLast(lookupMat);
+        const nextLoseVec = vecMatDot(chooseProb, lookupMatShifted);
+        loseMat.push(nextLoseVec);
     }
     return loseMat;
 }
