@@ -44,26 +44,22 @@ export function GameBoard(props: {
     const [playLog, setPlayLog] = useState<PlayLog>([]);
     const [gameEnd, setGameEnd] = useState(false);
 
-    const initialize = (loseMat : number[][], numCount : number, playerTurn : number, numEnd : number) : void => {
-        // const initialLog = getInitial({loseMat: loseMat, numCount: numCount, playerTurn: playerTurn, numEnd: numEnd})
-        // const currentNum = getCurrentNum(initialLog);
-        // if (currentNum >= numEnd) {
-        //     setGameEnd(true);
-        // }
-        // setPlayLog(initialLog);
+    const initialize = () : void => {
+        const initialLog : PlayLog = [];
+        setPlayLog(initialLog);
     }
 
     // initial ai play
     useEffect(() => {
         reset();
-        initialize(loseMat, numCount, playerTurn, numEnd);
+        initialize();
     }, [numEnd, numCount, numPlayer, playerTurn])
 
     const reset = () => {
         setPlayLog([]);
         setNumCall(1);
         setGameEnd(false);
-        initialize(loseMat, numCount, playerTurn, numEnd);
+        initialize();
     }
     
     const handleNumCallChange = (event : any) => {
