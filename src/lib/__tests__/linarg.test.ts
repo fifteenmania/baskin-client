@@ -1,4 +1,4 @@
-import { vecCumSum, vecFindMin, vecShiftToLast } from "../linarg"
+import { getUnitVec, vecCumSum, vecFindMin, vecMatDot, vecShiftToLast } from "../linarg"
 
 describe('findMin', () => {
     it('[1, 2] => 1', () => {
@@ -22,6 +22,12 @@ describe('vecShiftToLast', () => {
     it('[1, 2, 3] => [3, 1, 2]', () => {
         expect(vecShiftToLast([1, 2, 3])).toEqual([3, 1, 2])
     })
+    it('immutability', () => {
+        const vec = [1, 2, 3, 4];
+        const vecCpy = vec.slice();
+        vecShiftToLast(vec);
+        expect(vec).toEqual(vecCpy);
+    })
 })
 
 describe('vecCumSum', () => {
@@ -36,6 +42,25 @@ describe('vecCumSum', () => {
     })
     it("", () => {
         expect(vecCumSum([3, -1 , -1])).toEqual([3, 2, 1])
+    })
+})
+
+
+describe("vecMatDot", () => {
+    it("[1, 0], [[1, 2, 3], [4, 5, 6]] => [1, 2, 3]", () => {
+        expect(vecMatDot([1, 0], [[1, 2, 3], [4, 5, 6]])).toEqual([1, 2, 3])
+    })
+})
+
+describe("getUnitVec", () => {
+    it("", () => {
+        expect(getUnitVec(1)).toEqual([1])
+    })
+    it("", () => {
+        expect(getUnitVec(2)).toEqual([1, 0])
+    })
+    it("", () => {
+        expect(getUnitVec(3)).toEqual([1, 0, 0])
     })
 })
 

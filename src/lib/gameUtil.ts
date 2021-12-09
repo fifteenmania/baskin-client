@@ -41,7 +41,7 @@ export function makePlayLogEntry(newNum: number, numEnd: number, playerTurn: num
     }
 }
 
-export function handleAiTurnOnce(loseMat: number[][], playLog: PlayLog, maxCall: number, numEnd: number, aiTurn: number) {
+export function handleAiTurnOnce(loseMat: number[][], playLog: PlayLog, maxCall: number, numEnd: number, aiTurn: number): PlayLogEntry {
     const currentNum = getCurrentNum(playLog);
     const loseVec = getLoseVec(loseMat, maxCall, currentNum);
     const chooseProb = getChooseProb(loseVec);
