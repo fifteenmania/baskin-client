@@ -41,7 +41,7 @@ export function makePlayLogEntry(newNum: number, numEnd: number, playerTurn: num
     }
 }
 
-export function handleAiTurnOnce(loseMat: number[][], playLog: PlayLog, maxCall: number, numEnd: number, aiTurn: number) {
+export function handleAiTurnOnce(loseMat: number[][], playLog: PlayLog, maxCall: number, numEnd: number, aiTurn: number): PlayLogEntry {
     const currentNum = getCurrentNum(playLog);
     const loseVec = getLoseVec(loseMat, maxCall, currentNum);
     const chooseProb = getChooseProb(loseVec);
@@ -50,12 +50,32 @@ export function handleAiTurnOnce(loseMat: number[][], playLog: PlayLog, maxCall:
     return makePlayLogEntry(newNum, numEnd, aiTurn);
 }
 
-export function handlePlayerTurn(playLog: PlayLog, numChoose: number, numEnd: number, playerTurn: number): PlayLogEntry {
+/**
+ * 
+ * @param playLog current game play log
+ * @param numChoose human chose to call numbers up to `numChoose`
+ * @param numEnd last number of game
+ * @param playerTurn human player turn
+ * @returns updated playlog after human play. Doesn't mutate original playLog.
+ */
+export function handlePlayerTurn(playLog: PlayLog, numChoose: number, numEnd: number, playerTurn: number): PlayLog {
+    const playLogCopy = playLog.slice();
     const currentNum = getCurrentNum(playLog);
     const newNum = numChoose + currentNum;
-    return makePlayLogEntry(newNum, numEnd, playerTurn);
+    const newEntry = makePlayLogEntry(newNum, numEnd, playerTurn);
+    playLogCopy.push(newEntry);
+    return playLogCopy;
 }
 
+/**
+ * 
+ * @param loseMat lose rate matrix for all game states
+ * @param playLog current game play log
+ * @param maxCall maximum number of numbers
+ * @param numEnd last number of game
+ * @param playerTurn human player turn
+ * @returns updated playlog after ai play. Doesn't mutate original `playLog`
+ */
 export function handleAiTurns(loseMat: number[][], playLog: PlayLog, maxCall: number, numEnd: number, playerTurn: number): PlayLog {
     const playLogCopy = playLog.slice();
     while (true) {

@@ -1,4 +1,4 @@
-import { getChooseProb, getFullLoseProbMat, getLoseVec } from "../strategy"
+import { getChooseProb, getFullLoseProbMat, getLookupMat, getLookupMatRev, getLoseVec } from "../strategy"
 
 describe("getChooseProb", () => {
     it("[1] => [1]", () => {
@@ -15,6 +15,18 @@ describe("getChooseProb", () => {
     })
     it("[1, 0, 0, 0] => [0, 1/3, 1/3, 1/3]", () => {
         expect(getChooseProb([1, 0, 0, 0])).toEqual([0, 1/3, 1/3, 1/3])
+    })
+})
+
+describe("getLookupMatRev", () => {
+    it("", () => {
+        expect(getLookupMatRev([[1, 0], [0, 1]], 2, 30, 31)).toEqual([[1, 0]])
+    })
+    it("", () => {
+        expect(getLookupMatRev([[1, 0], [0, 1]], 2, 29, 31)).toEqual([[1, 0], [0, 1]])
+    })
+    it("", () => {
+        expect(getLookupMatRev([[1, 0, 0], [0, 1, 0]], 2, 29, 31)).toEqual([[1, 0, 0], [0, 1, 0]])
     })
 })
 
@@ -40,14 +52,22 @@ describe("getLoseVec", () => {
     it("", () => {
         expect(getLoseVec([[1, 0], [0, 1], [0.5, 0.5], [0, 1], [1, 0]], 2, 1)).toEqual([0.5, 0])
     })
+    it("", () => {
+        expect(getLookupMat([[1, 0, 0, 0]], 2, 0)).toEqual([])
+    })
 })
 
 describe("getFullLoseProbMat", () => {
     function getMessage(numPlayer: number, maxCount: number, numEnd: number) {
         return `numPlayer: ${numPlayer}, maxCount: ${maxCount}, numEnd: ${numEnd}`
     }
+    it(getMessage(2, 2, 1), () => {
+        expect(getFullLoseProbMat(2, 2, 1)).toEqual([[1, 0], [0, 1]].reverse())
+    })
     it(getMessage(2, 3, 4), () => {
-        expect(getFullLoseProbMat(2, 3, 4)).toEqual([[1, 0], [0, 1], [1, 0], [1, 0], [1, 0]].reverse())
+        const result = getFullLoseProbMat(2, 3, 4)
+        expect(result.length).toEqual(5)
+        expect(result).toEqual([[1, 0], [0, 1], [1, 0], [1, 0], [1, 0]].reverse())
     })
     it(getMessage(2, 2, 4), () => {
         expect(getFullLoseProbMat(2, 2, 4)).toEqual([[1, 0], [0, 1], [1, 0], [1, 0], [0, 1]].reverse())
