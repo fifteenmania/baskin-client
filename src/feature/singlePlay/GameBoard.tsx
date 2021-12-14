@@ -3,6 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { getFullLoseProbMat } from "../../lib/strategy";
 import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "../../lib/gameUtil";
 
+/**
+ * @param numEnd
+ * @param numCount maximum number of numbers can call in one turn
+ * @param numPlayer
+ * @param playerTurn 
+ */
 export interface BoardSetting {
     numEnd : number, 
     numCount : number, 
@@ -44,7 +50,7 @@ export function GameBoard(props: {
     const [playLog, setPlayLog] = useState<PlayLog>([]);
     const [gameEnd, setGameEnd] = useState(false);
 
-    const initialize = () : void => {
+    const initialize = () => {
         const initialLog : PlayLog = [];
         setPlayLog(initialLog);
     }
@@ -72,14 +78,9 @@ export function GameBoard(props: {
             return;
         }
         // handle player turn
-        const playerLogEntry = handlePlayerTurn(playLog, numEnd, playerTurn, numCall);
-        if (playerLogEntry.lastCall === numEnd) {
-            setPlayLog(playLog.concat(playerLogEntry))
-            setGameEnd(true);
-            return;
-        }
+        const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
         // after player turn, handle ai turns
-        const newPlayLog = handleAiTurns(loseMat, playLog.concat(playerLogEntry), numCall, numEnd, playerTurn);
+        const newPlayLog = handleAiTurns(loseMat, playerPlayLog, numCount, numEnd, playerTurn);
         const currentNum = getCurrentNum(newPlayLog);
         if (currentNum >= numEnd) {
             setGameEnd(true);
