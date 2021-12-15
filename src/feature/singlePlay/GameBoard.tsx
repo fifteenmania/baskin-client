@@ -1,7 +1,7 @@
 import { Stack, Typography, Paper, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
 import { useEffect, useMemo, useState } from "react";
-import { getFullLoseProbMat } from "../../lib/strategy";
-import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "../../lib/gameUtil";
+import { getFullLoseProbMat } from "baskin-lib/dist/lib/strategy";
+import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "baskin-lib/dist/lib/gameUtil";
 
 /**
  * @param numEnd
@@ -68,12 +68,12 @@ export function GameBoard(props: {
         initialize();
     }
     
-    const handleNumCallChange = (event : any) => {
+    const handleNumCallChange = (event : React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const newVal = parseInt(event.target.value)
         setNumCall(newVal);
     }
 
-    const handleCall = (event : any) => {
+    const handleCall = () => {
         if (gameEnd) {
             return;
         }
@@ -91,7 +91,7 @@ export function GameBoard(props: {
     return <Box sx={{p: 3}}>
         <Box>
             <FormControl sx={{width: "6em"}}>
-                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={handleNumCallChange} >
+                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumCallChange(event)} >
                     {[...Array(numCount).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
                 </TextField>
             </FormControl>
