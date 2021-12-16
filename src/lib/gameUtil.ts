@@ -46,7 +46,7 @@ export function handleAiTurnOnce(loseMat: number[][], playLog: PlayLog, maxCall:
     const loseVec = getLoseVec(loseMat, maxCall, currentNum);
     const chooseProb = getChooseProb(loseVec);
     const numChoose = getRandomIntAsVec(chooseProb);
-    const newNum = numChoose + currentNum;
+    const newNum = numChoose + currentNum + 1;
     return makePlayLogEntry(newNum, numEnd, aiTurn);
 }
 

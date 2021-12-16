@@ -8,7 +8,7 @@
 - 숫자를 100개까지 말할 수 있는 게임은 어떤가요? 1000명에서 하면 어떻게 될까요? 설정값을 마음대로 바꿔 보세요.
 
 ## 게임하러 가기
-깃헙 페이지에 호스팅 중! 아무것도 설치하지 않고 웹에서 즐겨요. [바로가기](https://github.com/fifteenmania/baskin-client)
+깃헙 페이지에 호스팅 중! 아무것도 설치하지 않고 웹에서 즐겨요. [바로가기](https://fifteenmania.github.io/baskin-client/)
 
 ## 기반 이론
 자세한 내용은 [pdf문서](https://www.overleaf.com/read/zrhdqqpsdxgp) 참고. (작성중)
