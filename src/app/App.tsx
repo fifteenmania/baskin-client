@@ -6,6 +6,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Calculator from '../feature/calculator/Calculator';
 import SinglePlay from '../feature/singlePlay/SinglePlay';
+import Multiplay from '../feature/multiPlay/Multiplay';
 
 function Title() {
   return <Typography variant='h2' component="h2">
@@ -22,12 +23,16 @@ function MainTab() {
     <Tabs value={tabId} onChange={handleTabChange}>
       <Tab label="승률 계산기" value="calculator"/>
       <Tab label="싱글 플레이" value="single-play"/>
+      <Tab label="멀티 플레이" value="multi-play"/>
     </Tabs>
     <TabPanel value={tabId} index={"calculator"}>
       <Calculator />
     </TabPanel>
     <TabPanel value={tabId} index={"single-play"}>
       <SinglePlay />
+    </TabPanel>
+    <TabPanel value={tabId} index={"multi-play"}>
+      <Multiplay/>
     </TabPanel>
   </div>
 }
