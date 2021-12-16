@@ -2685,10 +2685,10 @@
   "resolved" "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.0.tgz"
   "version" "1.0.0"
 
-"baskin-lib@^0.1.1":
-  "integrity" "sha512-0YMX8/FEhBTJKlSPUr0a+sDo1LPQZt10O1aqs8URT9QEc8YxsV6Nzq7Nc6Ll9zni+rO2mw4El0qMMs7+BXNUrQ=="
-  "resolved" "https://registry.npmjs.org/baskin-lib/-/baskin-lib-0.1.1.tgz"
-  "version" "0.1.1"
+"baskin-lib@^0.1.2":
+  "integrity" "sha512-VIIfVEVKH1wyVLIhZM6Uin+yTFYJc6uLBO/rqsBusSWZzWr/KybMEvf3sFMFj00/hkb+/VXUMxS5jUBtcZNhpw=="
+  "resolved" "https://registry.npmjs.org/baskin-lib/-/baskin-lib-0.1.2.tgz"
+  "version" "0.1.2"
 
 "batch@0.6.1":
   "integrity" "sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY="
