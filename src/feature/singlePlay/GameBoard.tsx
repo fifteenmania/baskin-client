@@ -1,7 +1,7 @@
 import { Stack, Typography, Paper, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
-import { useEffect, useMemo, useState } from "react";
-import { getFullLoseProbMat } from "baskin-lib/dist/lib/strategy";
-import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "baskin-lib/dist/lib/gameUtil";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getFullLoseProbMat } from "baskin-lib";
+import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "baskin-lib";
 
 /**
  * @param numEnd
@@ -55,18 +55,19 @@ export function GameBoard(props: {
         setPlayLog(initialLog);
     }
 
-    // initial ai play
-    useEffect(() => {
-        reset();
-        initialize();
-    }, [numEnd, numCount, numPlayer, playerTurn])
-
-    const reset = () => {
+    const reset = useCallback(() => {
         setPlayLog([]);
         setNumCall(1);
         setGameEnd(false);
         initialize();
-    }
+    }, [])
+
+    // initial ai play
+    useEffect(() => {
+        reset();
+        initialize();
+    }, [numEnd, numCount, numPlayer, playerTurn, reset])
+
     
     const handleNumCallChange = (event : React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const newVal = parseInt(event.target.value)
