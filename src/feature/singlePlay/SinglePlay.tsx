@@ -1,7 +1,8 @@
 import { Button, MenuItem, TextField, FormControl, Divider, Box } from "@mui/material";
 import { useState } from "react";
-import { handleNumberStateChange } from "../common/reactUtil";
+import { handleNumberSelectChange, handleNumberStateChange } from "../common/reactUtil";
 import { GameBoard, BoardSetting }  from "./GameBoard";
+import './style.css'
 
 function SinglePlay() {
     const [numPlayer, setNumPlayer] = useState<number>(3);
@@ -22,7 +23,6 @@ function SinglePlay() {
         setStarted(true);
     }
 
-
     return <div>
         <Box>
             <Box>
@@ -30,7 +30,7 @@ function SinglePlay() {
                 <TextField required id="num-count" label="최대 말하는 갯수" type="number" value={numCount} onChange={(event) => handleNumberStateChange(event, setNumCount)}/>
                 <TextField required id="num-end" label="마지막 숫자" type="number" value={numEnd} onChange={(event) => handleNumberStateChange(event, setNumEnd)}/>
                 <FormControl sx={{width: "6em"}}>
-                    <TextField required id="num-my" label="나의 순서" select value={playerTurn} onChange={(event) => handleNumberStateChange(event, setPlayerTurn)} >
+                    <TextField required id="num-my" label="나의 순서" select value={playerTurn} onChange={(event => handleNumberSelectChange(event, setPlayerTurn))} >
                         {[...Array(numPlayer).keys()].map((_, idx) => <MenuItem key={idx} value={idx}>{idx+1}</MenuItem>)}
                     </TextField>
                 </FormControl>

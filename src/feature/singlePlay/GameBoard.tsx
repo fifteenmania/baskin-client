@@ -1,7 +1,6 @@
 import { Stack, Typography, Paper, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getFullLoseProbMat } from "baskin-lib";
-import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "baskin-lib";
+import { getLastPlayer, getFullLoseProbMat, handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "baskin-lib";
 
 /**
  * @param numEnd
@@ -24,7 +23,7 @@ function NumberNode(
     const {log, playerTurn} = props;
     const {player, lastCall} = log;
     const msg = (playerTurn===player) ? `나   ` : `플레이어 ${player+1}`;
-    return <Paper>
+    return <Paper className="number-node">
         <Typography>{`${msg}: ${lastCall}`}</Typography>
     </Paper>
 }
@@ -44,7 +43,6 @@ export function GameBoard(props: {
     }) {
     const {boardSetting} = props;
     const {numEnd, numCount, numPlayer, playerTurn} = boardSetting;
-    //core 에서 가져와야함
     const loseMat = useMemo(() => getFullLoseProbMat(numPlayer, numCount, numEnd), [numEnd, numCount, numPlayer]);
     const [numCall, setNumCall] = useState(1);
     const [playLog, setPlayLog] = useState<PlayLog>([]);
@@ -68,6 +66,23 @@ export function GameBoard(props: {
         initialize();
     }, [numEnd, numCount, numPlayer, playerTurn, reset])
 
+    useEffect(() => {
+        // game end message
+        if (!gameEnd) {
+            return 
+        }
+        console.log(playerTurn)
+        const lastPlayer = getLastPlayer(playLog);
+        if (lastPlayer === undefined) {
+            alert("Invalid game setting. Change game settings.")
+            return
+        }
+        if (lastPlayer === playerTurn) {
+            alert("You lose!");
+        } else {
+            alert(`You win! player ${lastPlayer+1} lose`)
+        }
+    }, [gameEnd, playLog, playerTurn])
     
     const handleNumCallChange = (event : React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const newVal = parseInt(event.target.value)

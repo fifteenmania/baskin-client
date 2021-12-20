@@ -2686,9 +2686,9 @@
   "version" "1.0.0"
 
 "baskin-lib@^0.1.2":
-  "integrity" "sha512-VIIfVEVKH1wyVLIhZM6Uin+yTFYJc6uLBO/rqsBusSWZzWr/KybMEvf3sFMFj00/hkb+/VXUMxS5jUBtcZNhpw=="
-  "resolved" "https://registry.npmjs.org/baskin-lib/-/baskin-lib-0.1.2.tgz"
-  "version" "0.1.2"
+  "integrity" "sha512-ziC3lwFUw3jsO4MwCScu2gJPOm6jaQxiZdo9psV4O4brWdKlnpeN/zO5oAu/baTHP+/42e4UNkb5HHbSZ5EK4Q=="
+  "resolved" "https://registry.npmjs.org/baskin-lib/-/baskin-lib-0.1.4.tgz"
+  "version" "0.1.4"
 
 "batch@0.6.1":
   "integrity" "sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY="
