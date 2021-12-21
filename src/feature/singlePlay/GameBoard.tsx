@@ -1,6 +1,19 @@
-import { Stack, Typography, Paper, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getLastPlayer, getFullLoseProbMat, handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "baskin-lib";
+import { Stack, Typography, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getLastPlayer, 
+    getFullLoseProbMat, 
+    handlePlayerTurn, 
+    handleAiTurns, 
+    getCurrentNum, 
+    getCurrentPlayer, 
+    handleAiTurnOnce } from "baskin-lib";
+//types
+import {
+    PlayLog,
+    PlayLogEntry } from "baskin-lib"
+import { handleNumberSelectChange } from "../common/reactUtil";
+
+
 
 /**
  * @param numEnd
@@ -10,22 +23,35 @@ import { getLastPlayer, getFullLoseProbMat, handlePlayerTurn, handleAiTurns, Pla
  */
 export interface BoardSetting {
     numEnd : number, 
-    numCount : number, 
+    maxCall : number, 
     numPlayer : number, 
     playerTurn : number
 }
 
+/**
+ * Ui status regarding animations.
+ * On ai turn, skip `inputAccepted` phase.
+ * After every ui animation is finished, set on turnEnd phase.
+ * Check gameover on every turnStart phase.
+ */
+enum UiStatus {
+    turnStart,
+    waitingInput, // pending for user input
+    inputAccepted, // input is accepted and wating for animation end.
+    gameOver, // gameover state.
+}
+
 function NumberNode( 
-    props : { 
+    props : {
         log : PlayLogEntry, 
-        playerTurn : number 
+        playerTurn : number,
     }) {
     const {log, playerTurn} = props;
     const {player, lastCall} = log;
     const msg = (playerTurn===player) ? `나   ` : `플레이어 ${player+1}`;
-    return <Paper className="number-node">
+    return <div className="number-node" >
         <Typography>{`${msg}: ${lastCall}`}</Typography>
-    </Paper>
+    </div>
 }
 
 function NumberTree(props: {
@@ -42,36 +68,19 @@ export function GameBoard(props: {
         boardSetting : BoardSetting
     }) {
     const {boardSetting} = props;
-    const {numEnd, numCount, numPlayer, playerTurn} = boardSetting;
-    const loseMat = useMemo(() => getFullLoseProbMat(numPlayer, numCount, numEnd), [numEnd, numCount, numPlayer]);
+    const {numEnd, maxCall, numPlayer, playerTurn} = boardSetting;
+    const loseMat = useMemo(() => getFullLoseProbMat(numPlayer, maxCall, numEnd), [numEnd, maxCall, numPlayer]);
     const [numCall, setNumCall] = useState(1);
     const [playLog, setPlayLog] = useState<PlayLog>([]);
-    const [gameEnd, setGameEnd] = useState(false);
-
-    const initialize = () => {
-        const initialLog : PlayLog = [];
-        setPlayLog(initialLog);
-    }
+    const [uiStatus, setUiStatus] = useState<UiStatus>(UiStatus.turnStart);
 
     const reset = useCallback(() => {
         setPlayLog([]);
         setNumCall(1);
-        setGameEnd(false);
-        initialize();
+        setUiStatus(UiStatus.turnStart);
     }, [])
 
-    // initial ai play
-    useEffect(() => {
-        reset();
-        initialize();
-    }, [numEnd, numCount, numPlayer, playerTurn, reset])
-
-    useEffect(() => {
-        // game end message
-        if (!gameEnd) {
-            return 
-        }
-        console.log(playerTurn)
+    const printGameOver = (playLog: PlayLog, playerTurn: number) => {
         const lastPlayer = getLastPlayer(playLog);
         if (lastPlayer === undefined) {
             alert("Invalid game setting. Change game settings.")
@@ -82,36 +91,69 @@ export function GameBoard(props: {
         } else {
             alert(`You win! player ${lastPlayer+1} lose`)
         }
-    }, [gameEnd, playLog, playerTurn])
-    
-    const handleNumCallChange = (event : React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        const newVal = parseInt(event.target.value)
-        setNumCall(newVal);
     }
 
-    const handleCall = () => {
-        if (gameEnd) {
+    useEffect(() => {
+        reset();
+    }, [boardSetting, reset])
+
+    // handle turn start.
+    useEffect(() => {
+        if (uiStatus !== UiStatus.turnStart) {
             return;
         }
-        // handle player turn
-        const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
-        // after player turn, handle ai turns
-        const newPlayLog = handleAiTurns(loseMat, playerPlayLog, numCount, numEnd, playerTurn);
-        const currentNum = getCurrentNum(newPlayLog);
-        if (currentNum >= numEnd) {
-            setGameEnd(true);
+        console.log("turn start")
+        const currentNumber = getCurrentNum(playLog);
+        // check gameover.
+        if (currentNumber === numEnd) {
+            printGameOver(playLog, playerTurn);
+            setUiStatus(UiStatus.gameOver);
+            return;
         }
+        // check if it is player turn.
+        const currentPlayer = getCurrentPlayer(playLog, numPlayer);
+        if (currentPlayer === playerTurn) {
+            console.log("player turn")
+            setUiStatus(UiStatus.waitingInput);
+            return;
+        }
+        // handle ai turn.
+        const newPlayLogElement = handleAiTurnOnce(loseMat, playLog, maxCall, numEnd, currentPlayer);
+        const newPlayLog = playLog.concat(newPlayLogElement);
         setPlayLog(newPlayLog);
+        return;
+    }, [uiStatus, playLog, maxCall, numEnd, loseMat, numPlayer, playerTurn])
+
+    // After playlog update, wait until animation end.
+    useEffect(() => {
+        if (playLog.length === 0) {
+            return;
+        }
+        if (uiStatus !== UiStatus.turnStart && uiStatus !== UiStatus.waitingInput) {
+            return;
+        }
+        console.log("input accepted")
+        console.log(playLog);
+        setUiStatus(UiStatus.inputAccepted);
+    }, [playLog, uiStatus])
+
+    // handle user input
+    const handlePlayerCall = () => {
+        if (uiStatus !== UiStatus.waitingInput) {
+            return
+        }
+        const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
+        setPlayLog(playerPlayLog);
     }
     
     return <Box sx={{p: 3}}>
         <Box>
             <FormControl sx={{width: "6em"}}>
-                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumCallChange(event)} >
-                    {[...Array(numCount).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
+                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumberSelectChange(event, setNumCall)} >
+                    {[...Array(maxCall).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
                 </TextField>
             </FormControl>
-            <Button onClick={handleCall}>말하기</Button>
+            <Button onClick={handlePlayerCall}>말하기</Button>
             <Button onClick={reset}>초기화</Button>
         </Box>
         <Box sx={{p: 3, maxWidth: "30rem"}}>
