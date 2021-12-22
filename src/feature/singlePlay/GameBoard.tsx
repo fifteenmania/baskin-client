@@ -1,7 +1,19 @@
-import { Stack, Typography, Paper, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getFullLoseProbMat } from "baskin-lib";
-import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry } from "baskin-lib";
+import { Stack, Typography, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
+import { AnimationEventHandler, Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getLastPlayer, 
+    getFullLoseProbMat, 
+    handlePlayerTurn, 
+    handleAiTurns, 
+    getCurrentNum, 
+    getCurrentPlayer, 
+    handleAiTurnOnce } from "baskin-lib";
+//types
+import {
+    PlayLog,
+    PlayLogEntry } from "baskin-lib"
+import { handleNumberSelectChange } from "../common/reactUtil";
+
+
 
 /**
  * @param numEnd
@@ -11,31 +23,53 @@ import { handlePlayerTurn, handleAiTurns, PlayLog, getCurrentNum, PlayLogEntry }
  */
 export interface BoardSetting {
     numEnd : number, 
-    numCount : number, 
+    maxCall : number, 
     numPlayer : number, 
     playerTurn : number
 }
 
+/**
+ * Ui status regarding animations.
+ * On ai turn, skip `inputAccepted` phase.
+ * After every ui animation is finished, set on turnEnd phase.
+ * Check gameover on every turnStart phase.
+ */
+enum UiStatus {
+    turnStart,
+    beforeAiInput, 
+    waitingHumanInput, // pending for user input
+    inputAccepted, // input is accepted and wating for animation end.
+    gameOver, // gameover state.
+}
+
 function NumberNode( 
-    props : { 
+    props : {
         log : PlayLogEntry, 
-        playerTurn : number 
+        playerTurn : number,
+        onAnimationEnd: AnimationEventHandler<HTMLDivElement>
     }) {
-    const {log, playerTurn} = props;
+    const {log, playerTurn, onAnimationEnd} = props;
     const {player, lastCall} = log;
     const msg = (playerTurn===player) ? `나   ` : `플레이어 ${player+1}`;
-    return <Paper>
+    return <div className="number-node" onAnimationEnd={onAnimationEnd}>
         <Typography>{`${msg}: ${lastCall}`}</Typography>
-    </Paper>
+    </div>
 }
 
 function NumberTree(props: {
         playLog : PlayLog, 
-        playerTurn : number
+        playerTurn : number,
+        uiStatus: UiStatus,
+        setUiStatus: Dispatch<UiStatus>
     }) {
-    const {playLog, playerTurn} = props;
+    const {playLog, playerTurn, uiStatus, setUiStatus} = props;
+    useEffect(() => {
+        if (uiStatus === UiStatus.inputAccepted) {
+            setUiStatus(UiStatus.turnStart);
+        }
+    }, [uiStatus])
     return <Stack direction={{xs: "column-reverse"}}>
-        {playLog.map((item, idx) => <NumberNode key={idx} log={item} playerTurn={playerTurn}/>)}
+        {playLog.map((item, idx) => <NumberNode key={idx} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
     </Stack>
 }
 
@@ -43,64 +77,106 @@ export function GameBoard(props: {
         boardSetting : BoardSetting
     }) {
     const {boardSetting} = props;
-    const {numEnd, numCount, numPlayer, playerTurn} = boardSetting;
-    //core 에서 가져와야함
-    const loseMat = useMemo(() => getFullLoseProbMat(numPlayer, numCount, numEnd), [numEnd, numCount, numPlayer]);
+    const {numEnd, maxCall, numPlayer, playerTurn} = boardSetting;
+    const loseMat = useMemo(() => getFullLoseProbMat(numPlayer, maxCall, numEnd), [numEnd, maxCall, numPlayer]);
     const [numCall, setNumCall] = useState(1);
     const [playLog, setPlayLog] = useState<PlayLog>([]);
-    const [gameEnd, setGameEnd] = useState(false);
+    // act as global lock for ui
+    const [uiStatus, setUiStatus] = useState<UiStatus>(UiStatus.turnStart);
 
-    const initialize = () => {
-        const initialLog : PlayLog = [];
-        setPlayLog(initialLog);
+    const reset = () => {
+        console.log("reset")
+        setUiStatus(() => {
+            setPlayLog([]);
+            setNumCall(1);
+            return UiStatus.turnStart
+        });
     }
 
-    const reset = useCallback(() => {
-        setPlayLog([]);
-        setNumCall(1);
-        setGameEnd(false);
-        initialize();
-    }, [])
+    const printGameOver = (playLog: PlayLog, playerTurn: number) => {
+        const lastPlayer = getLastPlayer(playLog);
+        if (lastPlayer === undefined) {
+            alert("Invalid game setting. Change game settings.")
+            return
+        }
+        if (lastPlayer === playerTurn) {
+            alert("You lose!");
+        } else {
+            alert(`You win! player ${lastPlayer+1} lose`)
+        }
+    }
 
-    // initial ai play
+    // reset when game settings change.
     useEffect(() => {
         reset();
-        initialize();
-    }, [numEnd, numCount, numPlayer, playerTurn, reset])
+    }, [boardSetting])
 
-    
-    const handleNumCallChange = (event : React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        const newVal = parseInt(event.target.value)
-        setNumCall(newVal);
-    }
-
-    const handleCall = () => {
-        if (gameEnd) {
+    // On each turn start, check if it is player turn or game over
+    useEffect(() => {
+        if (uiStatus !== UiStatus.turnStart) {
             return;
         }
-        // handle player turn
-        const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
-        // after player turn, handle ai turns
-        const newPlayLog = handleAiTurns(loseMat, playerPlayLog, numCount, numEnd, playerTurn);
-        const currentNum = getCurrentNum(newPlayLog);
-        if (currentNum >= numEnd) {
-            setGameEnd(true);
+        console.log("turn start")
+        const currentNumber = getCurrentNum(playLog);
+        if (currentNumber === numEnd) {
+            printGameOver(playLog, playerTurn);
+            setUiStatus(UiStatus.gameOver);
+            return;
         }
-        setPlayLog(newPlayLog);
+        const currentPlayer = getCurrentPlayer(playLog, numPlayer);
+        if (currentPlayer === playerTurn) {
+            console.log("player turn")
+            setUiStatus(UiStatus.waitingHumanInput);
+            return;
+        }
+        console.log("ai turn")
+        setUiStatus(UiStatus.beforeAiInput);
+    }, [uiStatus, playLog, numPlayer, numEnd, playerTurn])
+
+    // Handle Ai turn.
+    useEffect(() => {
+        if (uiStatus !== UiStatus.beforeAiInput) {
+            return;
+        }
+        setPlayLog((prevPlayLog) => {
+            const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
+            const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
+            const newPlayLog = prevPlayLog.concat(newPlayLogElement);
+            return newPlayLog
+        })
+        return;
+    }, [uiStatus, maxCall, numEnd, loseMat, numPlayer, playerTurn])
+
+    // Handle user input
+    const handlePlayerCall = () => {
+        if (uiStatus !== UiStatus.waitingHumanInput) {
+            return
+        }
+        const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
+        setPlayLog(playerPlayLog);
     }
     
+    // After playLog updates, wait until animation end.
+    useEffect(() => {
+        if (playLog.length === 0) {
+            return;
+        }
+        console.log("input accepted, waiting animation")
+        setUiStatus(UiStatus.inputAccepted);
+    }, [playLog])
+
     return <Box sx={{p: 3}}>
         <Box>
             <FormControl sx={{width: "6em"}}>
-                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumCallChange(event)} >
-                    {[...Array(numCount).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
+                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumberSelectChange(event, setNumCall)} >
+                    {[...Array(maxCall).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
                 </TextField>
             </FormControl>
-            <Button onClick={handleCall}>말하기</Button>
+            <Button onClick={handlePlayerCall}>말하기</Button>
             <Button onClick={reset}>초기화</Button>
         </Box>
         <Box sx={{p: 3, maxWidth: "30rem"}}>
-            <NumberTree playLog={playLog} playerTurn={playerTurn}/>
+            <NumberTree playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
         </Box>
     </Box>
 }

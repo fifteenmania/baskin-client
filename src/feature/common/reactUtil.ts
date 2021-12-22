@@ -14,3 +14,8 @@ export function handleNumberStateChange(event: ChangeEvent<HTMLInputElement | HT
     }
     setState(newVal);
 }
+
+export function handleNumberSelectChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, setState: Dispatch<SetStateAction<number>>): void {
+    const newVal = parseInt(event.target.value);
+    setState(newVal);
+}
