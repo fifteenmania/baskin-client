@@ -28,10 +28,13 @@ export interface BoardSetting {
 }
 
 /**
- * Ui status regarding animations.
- * On ai turn, skip `inputAccepted` phase.
- * After every ui animation is finished, set on turnEnd phase.
- * Check gameover on every turnStart phase.
+ * Ui status type.
+ * On each `turnStart`, check whether it is ai turn or human turn.
+ * If the game is over, go to `gameOver` phase.
+ * If it is ai turn, go to `beforeAiInput` phase.
+ * If it is human turn, go to `watingHumanInput` phase.
+ * After ai or human decide their input and updated playLog, go to `inputAccepted` phase.
+ * After all animation finished, go to `turnStart` phase and repeat.
  */
 enum UiStatus {
     turnStart,
