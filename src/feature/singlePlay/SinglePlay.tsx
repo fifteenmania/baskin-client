@@ -50,7 +50,7 @@ function SinglePlay() {
                     </TextField>
                 </FormControl>
             </Box>
-            <Button onClick={handleClick}>{started? "설정 변경": "게임 시작"}</Button>
+            <Button onClick={handleClick}>{started? "설정 반영하여 재시작": "게임 시작"}</Button>
         </Box>
         <Divider variant="middle"/>
         {started? <GameBoard boardSetting={numSetting}/> : null}

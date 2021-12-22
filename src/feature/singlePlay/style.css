@@ -10,7 +10,7 @@
 .number-node {
     padding-left: 3px;
     border: solid 1px #808080;
-    animation: 0.5s ease-in 0s slide-in-from-bottom;
+    animation: 0.2s ease-in 0s slide-in-from-bottom;
 }
 
 .number-node-text {
