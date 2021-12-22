@@ -172,7 +172,7 @@ export function GameBoard(props: {
                     {[...Array(maxCall).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
                 </TextField>
             </FormControl>
-            <Button onClick={handlePlayerCall}>말하기</Button>
+            <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
             <Button onClick={reset}>초기화</Button>
         </Box>
         <Box sx={{p: 3, maxWidth: "30rem"}}>
