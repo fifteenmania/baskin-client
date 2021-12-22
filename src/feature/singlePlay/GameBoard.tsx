@@ -1,4 +1,4 @@
-import { Stack, Typography, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
+import { Stack, TextField, MenuItem, FormControl, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
 import { AnimationEventHandler, Dispatch, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
@@ -83,6 +83,7 @@ export function GameBoard(props: {
     const [playLog, setPlayLog] = useState<PlayLog>([]);
     // act as global lock for ui
     const [uiStatus, setUiStatus] = useState<UiStatus>(UiStatus.turnStart);
+    const [autoRestart, setAutoRestart] = useState<boolean>(false);
 
     const reset = () => {
         console.log("reset")
@@ -165,8 +166,18 @@ export function GameBoard(props: {
         setUiStatus(UiStatus.inputAccepted);
     }, [playLog])
 
+    // If auto-restart, reset after gameOver.
+    useEffect(() => {
+        if (uiStatus !== UiStatus.gameOver) {
+            return
+        }
+        if (autoRestart) {
+            reset();
+        }
+    }, [uiStatus, autoRestart])
+
     return <Box sx={{p: 3}}>
-        <Box>
+        <div>
             <FormControl sx={{width: "6em"}}>
                 <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumberSelectChange(event, setNumCall)} >
                     {[...Array(maxCall).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
@@ -174,7 +185,16 @@ export function GameBoard(props: {
             </FormControl>
             <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
             <Button onClick={reset}>초기화</Button>
-        </Box>
+        </div>
+        <div>
+            <FormControlLabel 
+                control={<Checkbox
+                    value={autoRestart}
+                    onChange={() => {setAutoRestart(!autoRestart)}}
+                ></Checkbox>}
+                label="자동 재시작"
+            ></FormControlLabel>
+        </div>
         <Box sx={{p: 3, maxWidth: "30rem"}}>
             <NumberTree playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
         </Box>
