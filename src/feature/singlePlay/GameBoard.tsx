@@ -1,5 +1,5 @@
 import { Stack, Typography, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimationEventHandler, Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
     handlePlayerTurn, 
@@ -36,7 +36,8 @@ export interface BoardSetting {
  */
 enum UiStatus {
     turnStart,
-    waitingInput, // pending for user input
+    beforeAiInput, 
+    waitingHumanInput, // pending for user input
     inputAccepted, // input is accepted and wating for animation end.
     gameOver, // gameover state.
 }
@@ -45,22 +46,30 @@ function NumberNode(
     props : {
         log : PlayLogEntry, 
         playerTurn : number,
+        onAnimationEnd: AnimationEventHandler<HTMLDivElement>
     }) {
-    const {log, playerTurn} = props;
+    const {log, playerTurn, onAnimationEnd} = props;
     const {player, lastCall} = log;
     const msg = (playerTurn===player) ? `나   ` : `플레이어 ${player+1}`;
-    return <div className="number-node" >
+    return <div className="number-node" onAnimationEnd={onAnimationEnd}>
         <Typography>{`${msg}: ${lastCall}`}</Typography>
     </div>
 }
 
 function NumberTree(props: {
         playLog : PlayLog, 
-        playerTurn : number
+        playerTurn : number,
+        uiStatus: UiStatus,
+        setUiStatus: Dispatch<UiStatus>
     }) {
-    const {playLog, playerTurn} = props;
+    const {playLog, playerTurn, uiStatus, setUiStatus} = props;
+    useEffect(() => {
+        if (uiStatus === UiStatus.inputAccepted) {
+            setUiStatus(UiStatus.turnStart);
+        }
+    }, [uiStatus])
     return <Stack direction={{xs: "column-reverse"}}>
-        {playLog.map((item, idx) => <NumberNode key={idx} log={item} playerTurn={playerTurn}/>)}
+        {playLog.map((item, idx) => <NumberNode key={idx} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
     </Stack>
 }
 
@@ -72,13 +81,17 @@ export function GameBoard(props: {
     const loseMat = useMemo(() => getFullLoseProbMat(numPlayer, maxCall, numEnd), [numEnd, maxCall, numPlayer]);
     const [numCall, setNumCall] = useState(1);
     const [playLog, setPlayLog] = useState<PlayLog>([]);
+    // act as global lock for ui
     const [uiStatus, setUiStatus] = useState<UiStatus>(UiStatus.turnStart);
 
-    const reset = useCallback(() => {
-        setPlayLog([]);
-        setNumCall(1);
-        setUiStatus(UiStatus.turnStart);
-    }, [])
+    const reset = () => {
+        console.log("reset")
+        setUiStatus(() => {
+            setPlayLog([]);
+            setNumCall(1);
+            return UiStatus.turnStart
+        });
+    }
 
     const printGameOver = (playLog: PlayLog, playerTurn: number) => {
         const lastPlayer = getLastPlayer(playLog);
@@ -93,59 +106,65 @@ export function GameBoard(props: {
         }
     }
 
+    // reset when game settings change.
     useEffect(() => {
         reset();
-    }, [boardSetting, reset])
+    }, [boardSetting])
 
-    // handle turn start.
+    // On each turn start, check if it is player turn or game over
     useEffect(() => {
         if (uiStatus !== UiStatus.turnStart) {
             return;
         }
         console.log("turn start")
         const currentNumber = getCurrentNum(playLog);
-        // check gameover.
         if (currentNumber === numEnd) {
             printGameOver(playLog, playerTurn);
             setUiStatus(UiStatus.gameOver);
             return;
         }
-        // check if it is player turn.
         const currentPlayer = getCurrentPlayer(playLog, numPlayer);
         if (currentPlayer === playerTurn) {
             console.log("player turn")
-            setUiStatus(UiStatus.waitingInput);
+            setUiStatus(UiStatus.waitingHumanInput);
             return;
         }
-        // handle ai turn.
-        const newPlayLogElement = handleAiTurnOnce(loseMat, playLog, maxCall, numEnd, currentPlayer);
-        const newPlayLog = playLog.concat(newPlayLogElement);
-        setPlayLog(newPlayLog);
-        return;
-    }, [uiStatus, playLog, maxCall, numEnd, loseMat, numPlayer, playerTurn])
+        console.log("ai turn")
+        setUiStatus(UiStatus.beforeAiInput);
+    }, [uiStatus, playLog, numPlayer, numEnd, playerTurn])
 
-    // After playlog update, wait until animation end.
+    // Handle Ai turn.
     useEffect(() => {
-        if (playLog.length === 0) {
+        if (uiStatus !== UiStatus.beforeAiInput) {
             return;
         }
-        if (uiStatus !== UiStatus.turnStart && uiStatus !== UiStatus.waitingInput) {
-            return;
-        }
-        console.log("input accepted")
-        console.log(playLog);
-        setUiStatus(UiStatus.inputAccepted);
-    }, [playLog, uiStatus])
+        setPlayLog((prevPlayLog) => {
+            const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
+            const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
+            const newPlayLog = prevPlayLog.concat(newPlayLogElement);
+            return newPlayLog
+        })
+        return;
+    }, [uiStatus, maxCall, numEnd, loseMat, numPlayer, playerTurn])
 
-    // handle user input
+    // Handle user input
     const handlePlayerCall = () => {
-        if (uiStatus !== UiStatus.waitingInput) {
+        if (uiStatus !== UiStatus.waitingHumanInput) {
             return
         }
         const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
         setPlayLog(playerPlayLog);
     }
     
+    // After playLog updates, wait until animation end.
+    useEffect(() => {
+        if (playLog.length === 0) {
+            return;
+        }
+        console.log("input accepted, waiting animation")
+        setUiStatus(UiStatus.inputAccepted);
+    }, [playLog])
+
     return <Box sx={{p: 3}}>
         <Box>
             <FormControl sx={{width: "6em"}}>
@@ -157,7 +176,7 @@ export function GameBoard(props: {
             <Button onClick={reset}>초기화</Button>
         </Box>
         <Box sx={{p: 3, maxWidth: "30rem"}}>
-            <NumberTree playLog={playLog} playerTurn={playerTurn}/>
+            <NumberTree playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
         </Box>
     </Box>
 }
