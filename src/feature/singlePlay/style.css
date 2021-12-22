@@ -8,7 +8,11 @@
 }
 
 .number-node {
+    padding-left: 3px;
     border: solid 1px #808080;
     animation: 0.5s ease-out 0s slide-in-from-bottom;
 }
 
+.number-node-text {
+    white-space: pre-wrap;
+}
