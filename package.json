@@ -1,6 +1,6 @@
 {
   "name": "baskin-client",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "homepage": "https://fifteenmania.github.io/baskin-client/",
   "dependencies": {
