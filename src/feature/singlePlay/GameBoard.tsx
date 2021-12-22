@@ -1,9 +1,8 @@
 import { Stack, Typography, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
-import { AnimationEventHandler, Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimationEventHandler, Dispatch, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
     handlePlayerTurn, 
-    handleAiTurns, 
     getCurrentNum, 
     getCurrentPlayer, 
     handleAiTurnOnce } from "baskin-lib";
@@ -50,9 +49,10 @@ function NumberNode(
     }) {
     const {log, playerTurn, onAnimationEnd} = props;
     const {player, lastCall} = log;
-    const msg = (playerTurn===player) ? `나   ` : `플레이어 ${player+1}`;
+    const msg = (playerTurn===player) ? "나                " : `플레이어 ${player+1}`;
     return <div className="number-node" onAnimationEnd={onAnimationEnd}>
-        <Typography>{`${msg}: ${lastCall}`}</Typography>
+        <span className="number-node-text">
+            <strong>{msg}</strong>{`: ${lastCall}`}</span>
     </div>
 }
 
@@ -67,7 +67,7 @@ function NumberTree(props: {
         if (uiStatus === UiStatus.inputAccepted) {
             setUiStatus(UiStatus.turnStart);
         }
-    }, [uiStatus])
+    }, [uiStatus, setUiStatus])
     return <Stack direction={{xs: "column-reverse"}}>
         {playLog.map((item, idx) => <NumberNode key={idx} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
     </Stack>
