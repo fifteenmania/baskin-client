@@ -6,11 +6,21 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react";
  * @param event Html change event
  * @param setState state setter
  */
-export function handleNumberStateChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, setState: Dispatch<SetStateAction<number>>): void {
+export function handleNumberStateChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, setState: Dispatch<SetStateAction<number>>, option: {minVal: number, maxVal: number} = {minVal: 0, maxVal:1000}): void {
     const newVal = parseInt(event.currentTarget.value);
-    if (isNaN(newVal) || newVal < 0) {
-        setState(0);
+    const {minVal, maxVal} = option;
+    if (isNaN(newVal) || newVal < minVal) {
+        setState(minVal);
         return;
     }
+    if (newVal > maxVal) {
+        setState(maxVal);
+        return;
+    }
+    setState(newVal);
+}
+
+export function handleNumberSelectChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, setState: Dispatch<SetStateAction<number>>): void {
+    const newVal = parseInt(event.target.value);
     setState(newVal);
 }
