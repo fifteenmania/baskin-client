@@ -210,17 +210,6 @@ export function GameBoard(props: {
 
     return <Box sx={{p: 3}}>
         <div>
-            <TextField required 
-                id="num-call" 
-                label="몇 개 말할까" 
-                type="number" 
-                value={numCall} 
-                onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
-            />
-            <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
-            <Button onClick={reset}>재시작</Button>
-        </div>
-        <div>
             <FormControlLabel 
                 control={<Checkbox
                     value={autoRestart}
@@ -235,6 +224,17 @@ export function GameBoard(props: {
                 ></Checkbox>}
                 label="예상 승률 보이기"
             ></FormControlLabel>
+        </div>
+        <div>
+            <TextField required 
+                id="num-call" 
+                label="몇 개 말할까" 
+                type="number" 
+                value={numCall} 
+                onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
+            />
+            <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
+            <Button onClick={reset}>재시작</Button>
         </div>
         <PickedNumber 
             pickedNumber={getCurrentNum(playLog) + numCall}
