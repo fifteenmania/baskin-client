@@ -1,16 +1,16 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { useState } from 'react';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
 import Calculator from '../feature/calculator/Calculator';
 import SinglePlay from '../feature/singlePlay/SinglePlay';
 import Multiplay from '../feature/multiPlay/Multiplay';
 
+import 'typeface-roboto';
+import './style.css';
+import Footer from './Footer';
+
 function Title() {
   return <Typography variant='h2' component="h2">
-    베스킨라빈스 31 술게임 시뮬레이터
+    배스킨라빈스 31 술게임 시뮬레이터
   </Typography>
 }
 
@@ -51,6 +51,7 @@ function App() {
     <div className="App">
       <Title />
       <MainTab />
+      <Footer />
     </div>
   );
 }
