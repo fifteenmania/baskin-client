@@ -1,5 +1,6 @@
 import { Box, Divider, TextField } from "@mui/material";
 import { useState } from "react"
+import Simulation from "../chart/Simulation";
 import { handleNumberStateChange } from "../common/reactUtil";
 
 function Calculator() {
@@ -14,6 +15,7 @@ function Calculator() {
             <TextField required id="num-end" label="마지막 숫자" type="number" value={numEnd} onChange={(event) => handleNumberStateChange(event, setNumEnd)}/> 
         </Box>
         <Divider variant="middle" />
+        <Simulation/>
     </div>
 }
 
