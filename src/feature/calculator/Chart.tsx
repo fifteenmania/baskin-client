@@ -30,19 +30,19 @@ function ChartMarkers(props : {
 }) {
     const {points} = props;
     return <g>
-        {points.map(({x, y}, idx) => <circle key={`${idx}`} cx={x} cy={y} r="5" fill="black" tabIndex={idx} onFocus={}/>)}
+        {points.map(({x, y}, idx) => <circle key={`${idx}`} cx={x} cy={y} r="5" fill="black" tabIndex={idx}/>)}
     </g>
 }
 
 function ChartBox(props : {
     numPlayer : number,
-    numCount : number,
+    maxCall : number,
     numEnd : number,
     width : number,
     height : number
 }) {
-    const {numPlayer, numCount, numEnd, width, height} = props;
-    const loseMat = getFullLoseProbMat(numPlayer, numCount, numEnd);
+    const {numPlayer, maxCall, numEnd, width, height} = props;
+    const loseMat = getFullLoseProbMat(numPlayer, maxCall, numEnd);
     const data = loseMat.map((row) => row[0]);
 
     const xScale = scaleLinear().domain([0, data.length-1]).range([0, width]);
