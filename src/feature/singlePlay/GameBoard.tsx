@@ -1,9 +1,8 @@
-import { Stack, Typography, TextField, MenuItem, FormControl, Button, Box } from "@mui/material"
-import { AnimationEventHandler, Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Stack, TextField, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
+import { AnimationEventHandler, Dispatch, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
     handlePlayerTurn, 
-    handleAiTurns, 
     getCurrentNum, 
     getCurrentPlayer, 
     handleAiTurnOnce } from "baskin-lib";
@@ -11,7 +10,7 @@ import { getLastPlayer,
 import {
     PlayLog,
     PlayLogEntry } from "baskin-lib"
-import { handleNumberSelectChange } from "../common/reactUtil";
+import { handleNumberStateChange } from "../common/reactUtil";
 
 
 
@@ -29,10 +28,13 @@ export interface BoardSetting {
 }
 
 /**
- * Ui status regarding animations.
- * On ai turn, skip `inputAccepted` phase.
- * After every ui animation is finished, set on turnEnd phase.
- * Check gameover on every turnStart phase.
+ * Ui status type.
+ * On each `turnStart`, check whether it is ai turn or human turn.
+ * If the game is over, go to `gameOver` phase.
+ * If it is ai turn, go to `beforeAiInput` phase.
+ * If it is human turn, go to `watingHumanInput` phase.
+ * After ai or human decide their input and updated playLog, go to `inputAccepted` phase.
+ * After all animation finished, go to `turnStart` phase and repeat.
  */
 enum UiStatus {
     turnStart,
@@ -50,9 +52,10 @@ function NumberNode(
     }) {
     const {log, playerTurn, onAnimationEnd} = props;
     const {player, lastCall} = log;
-    const msg = (playerTurn===player) ? `나   ` : `플레이어 ${player+1}`;
+    const msg = (playerTurn===player) ? "나                " : `플레이어 ${player+1}`;
     return <div className="number-node" onAnimationEnd={onAnimationEnd}>
-        <Typography>{`${msg}: ${lastCall}`}</Typography>
+        <span className="number-node-text">
+            <strong>{msg}</strong>{`: ${lastCall}`}</span>
     </div>
 }
 
@@ -67,10 +70,38 @@ function NumberTree(props: {
         if (uiStatus === UiStatus.inputAccepted) {
             setUiStatus(UiStatus.turnStart);
         }
-    }, [uiStatus])
+    }, [uiStatus, setUiStatus])
     return <Stack direction={{xs: "column-reverse"}}>
         {playLog.map((item, idx) => <NumberNode key={idx} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
     </Stack>
+}
+
+function getWinRate(loseMatrix: number[][], pickedNumber: number) {
+    return loseMatrix.length > pickedNumber ? 
+        1 - loseMatrix[pickedNumber][0] : 
+        undefined;
+}
+
+function PickedNumber(props: {
+        pickedNumber: number,
+        winRate: number| undefined,
+        showWinRate: boolean,
+    }) {
+    const {pickedNumber, winRate, showWinRate} = props;
+    const winRateText = (winRate === undefined)? 
+        "정의되지 않음":
+        `${(winRate*100).toFixed(2)} %`
+    return <div>
+        <span>
+            {`말할 숫자: ${pickedNumber} `}
+        </span>
+        {showWinRate ?
+            <span>
+                {`/ 예상 승률: ${winRateText} `}
+            </span> :
+            null
+        }
+    </div>
 }
 
 export function GameBoard(props: {
@@ -83,6 +114,8 @@ export function GameBoard(props: {
     const [playLog, setPlayLog] = useState<PlayLog>([]);
     // act as global lock for ui
     const [uiStatus, setUiStatus] = useState<UiStatus>(UiStatus.turnStart);
+    const [autoRestart, setAutoRestart] = useState<boolean>(false);
+    const [showWinRate, setShowWinRate] = useState<boolean>(false);
 
     const reset = () => {
         console.log("reset")
@@ -165,16 +198,49 @@ export function GameBoard(props: {
         setUiStatus(UiStatus.inputAccepted);
     }, [playLog])
 
+    // If auto-restart, reset after gameOver.
+    useEffect(() => {
+        if (uiStatus !== UiStatus.gameOver) {
+            return
+        }
+        if (autoRestart) {
+            reset();
+        }
+    }, [uiStatus, autoRestart])
+
     return <Box sx={{p: 3}}>
-        <Box>
-            <FormControl sx={{width: "6em"}}>
-                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumberSelectChange(event, setNumCall)} >
-                    {[...Array(maxCall).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
-                </TextField>
-            </FormControl>
+        <div>
+            <TextField required 
+                id="num-call" 
+                label="몇 개 말할까" 
+                type="number" 
+                value={numCall} 
+                onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
+            />
             <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
-            <Button onClick={reset}>초기화</Button>
-        </Box>
+            <Button onClick={reset}>재시작</Button>
+        </div>
+        <div>
+            <FormControlLabel 
+                control={<Checkbox
+                    value={autoRestart}
+                    onChange={() => {setAutoRestart(!autoRestart)}}
+                ></Checkbox>}
+                label="자동 재시작"
+            ></FormControlLabel>
+            <FormControlLabel 
+                control={<Checkbox
+                    value={!showWinRate}
+                    onChange={() => {setShowWinRate(!showWinRate)}}
+                ></Checkbox>}
+                label="예상 승률 보이기"
+            ></FormControlLabel>
+        </div>
+        <PickedNumber 
+            pickedNumber={getCurrentNum(playLog) + numCall}
+            winRate={getWinRate(loseMat, getCurrentNum(playLog) + numCall)}
+            showWinRate={showWinRate}
+        />
         <Box sx={{p: 3, maxWidth: "30rem"}}>
             <NumberTree playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
         </Box>

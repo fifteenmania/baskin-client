@@ -1,15 +1,16 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { useState } from 'react';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
 import Calculator from '../feature/calculator/Calculator';
 import SinglePlay from '../feature/singlePlay/SinglePlay';
+import Multiplay from '../feature/multiPlay/Multiplay';
+
+import 'typeface-roboto';
+import './style.css';
+import Footer from './Footer';
 
 function Title() {
-  return <Typography variant='h2' component="h2">
-    베스킨라빈스 31 술게임 시뮬레이터
+  return <Typography variant='h3' component="h3">
+    배스킨라빈스 31 웹게임
   </Typography>
 }
 
@@ -22,12 +23,16 @@ function MainTab() {
     <Tabs value={tabId} onChange={handleTabChange}>
       <Tab label="승률 계산기" value="calculator"/>
       <Tab label="싱글 플레이" value="single-play"/>
+      <Tab label="멀티 플레이" value="multi-play"/>
     </Tabs>
     <TabPanel value={tabId} index={"calculator"}>
       <Calculator />
     </TabPanel>
     <TabPanel value={tabId} index={"single-play"}>
       <SinglePlay />
+    </TabPanel>
+    <TabPanel value={tabId} index={"multi-play"}>
+      <Multiplay/>
     </TabPanel>
   </div>
 }
@@ -44,8 +49,11 @@ function TabPanel(props: {value: string, index: string, children: JSX.Element}) 
 function App() {
   return (
     <div className="App">
-      <Title />
-      <MainTab />
+      <div className="page-wrapper">
+        <Title />
+        <MainTab />
+      </div>
+      <Footer />
     </div>
   );
 }

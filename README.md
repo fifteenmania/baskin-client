@@ -10,9 +10,6 @@
 ## 게임하러 가기
 깃헙 페이지에 호스팅 중! 아무것도 설치하지 않고 웹에서 즐겨요. [바로가기](https://fifteenmania.github.io/baskin-client/)
 
-## 기반 이론
-자세한 내용은 [pdf문서](https://www.overleaf.com/read/zrhdqqpsdxgp) 참고. (작성중)
-
 ## 프로젝트 기여하기
 타입스크립트와 리액트를 이용하고 있어요.  
 소스 코드 수준 공개를 원칙으로 해요.   
