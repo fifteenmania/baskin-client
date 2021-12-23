@@ -1,4 +1,4 @@
-import { Stack, TextField, MenuItem, FormControl, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
+import { Stack, TextField, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
 import { AnimationEventHandler, Dispatch, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
@@ -10,7 +10,7 @@ import { getLastPlayer,
 import {
     PlayLog,
     PlayLogEntry } from "baskin-lib"
-import { handleNumberSelectChange } from "../common/reactUtil";
+import { handleNumberStateChange } from "../common/reactUtil";
 
 
 
@@ -76,6 +76,34 @@ function NumberTree(props: {
     </Stack>
 }
 
+function getWinRate(loseMatrix: number[][], pickedNumber: number) {
+    return loseMatrix.length > pickedNumber ? 
+        1 - loseMatrix[pickedNumber][0] : 
+        undefined;
+}
+
+function PickedNumber(props: {
+        pickedNumber: number,
+        winRate: number| undefined,
+        showWinRate: boolean,
+    }) {
+    const {pickedNumber, winRate, showWinRate} = props;
+    const winRateText = (winRate === undefined)? 
+        "정의되지 않음":
+        `${(winRate*100).toFixed(2)} %`
+    return <div>
+        <span>
+            {`말할 숫자: ${pickedNumber} `}
+        </span>
+        {showWinRate ?
+            <span>
+                {`/ 예상 승률: ${winRateText} `}
+            </span> :
+            null
+        }
+    </div>
+}
+
 export function GameBoard(props: {
         boardSetting : BoardSetting
     }) {
@@ -87,6 +115,7 @@ export function GameBoard(props: {
     // act as global lock for ui
     const [uiStatus, setUiStatus] = useState<UiStatus>(UiStatus.turnStart);
     const [autoRestart, setAutoRestart] = useState<boolean>(false);
+    const [showWinRate, setShowWinRate] = useState<boolean>(false);
 
     const reset = () => {
         console.log("reset")
@@ -181,13 +210,15 @@ export function GameBoard(props: {
 
     return <Box sx={{p: 3}}>
         <div>
-            <FormControl sx={{width: "6em"}}>
-                <TextField required id="call-num" select label="몇 개 말할까" value={numCall} onChange={(event) => handleNumberSelectChange(event, setNumCall)} >
-                    {[...Array(maxCall).keys()].map((_, idx) => <MenuItem key={idx+1} value={idx+1}>{idx+1}</MenuItem>)}
-                </TextField>
-            </FormControl>
+            <TextField required 
+                id="num-call" 
+                label="몇 개 말할까" 
+                type="number" 
+                value={numCall} 
+                onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
+            />
             <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
-            <Button onClick={reset}>초기화</Button>
+            <Button onClick={reset}>재시작</Button>
         </div>
         <div>
             <FormControlLabel 
@@ -197,7 +228,19 @@ export function GameBoard(props: {
                 ></Checkbox>}
                 label="자동 재시작"
             ></FormControlLabel>
+            <FormControlLabel 
+                control={<Checkbox
+                    value={!showWinRate}
+                    onChange={() => {setShowWinRate(!showWinRate)}}
+                ></Checkbox>}
+                label="예상 승률 보이기"
+            ></FormControlLabel>
         </div>
+        <PickedNumber 
+            pickedNumber={getCurrentNum(playLog) + numCall}
+            winRate={getWinRate(loseMat, getCurrentNum(playLog) + numCall)}
+            showWinRate={showWinRate}
+        />
         <Box sx={{p: 3, maxWidth: "30rem"}}>
             <NumberTree playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
         </Box>

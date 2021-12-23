@@ -9,8 +9,8 @@ import './style.css';
 import Footer from './Footer';
 
 function Title() {
-  return <Typography variant='h2' component="h2">
-    배스킨라빈스 31 술게임 시뮬레이터
+  return <Typography variant='h3' component="h3">
+    배스킨라빈스 31 웹게임
   </Typography>
 }
 

@@ -65,9 +65,7 @@ function Description() {
 export default function Footer() {
     return <div>
         <footer className="main-footer">
-            <FooterTitle/>
             <Description/>
-            <BuildInfo/>
             <ContactInfo/>
         </footer>
     </div>
