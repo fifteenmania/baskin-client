@@ -1,6 +1,7 @@
+.page-wrapper {
+    min-height: 68vh;
+}
 
 .main-footer {
-    border-top: 3px black;
     position: absolute;
-
 }

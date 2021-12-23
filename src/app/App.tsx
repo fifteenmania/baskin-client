@@ -49,8 +49,10 @@ function TabPanel(props: {value: string, index: string, children: JSX.Element}) 
 function App() {
   return (
     <div className="App">
-      <Title />
-      <MainTab />
+      <div className="page-wrapper">
+        <Title />
+        <MainTab />
+      </div>
       <Footer />
     </div>
   );
