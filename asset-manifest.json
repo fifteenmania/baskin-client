@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/baskin-client/static/css/main.b667bd7d.css",
-    "main.js": "/baskin-client/static/js/main.7244858a.js",
+    "main.css": "/baskin-client/static/css/main.a67deceb.css",
+    "main.js": "/baskin-client/static/js/main.45259cac.js",
     "static/js/983.b890c8ee.chunk.js": "/baskin-client/static/js/983.b890c8ee.chunk.js",
     "static/js/753.70fbc3bc.chunk.js": "/baskin-client/static/js/753.70fbc3bc.chunk.js",
     "static/media/roboto-latin-900italic.woff": "/baskin-client/static/media/roboto-latin-900italic.c20d916c1a1b094c1cec.woff",
@@ -29,13 +29,13 @@
     "static/media/roboto-latin-400.woff2": "/baskin-client/static/media/roboto-latin-400.176f8f5bd5f02b3abfcf.woff2",
     "static/media/roboto-latin-900.woff2": "/baskin-client/static/media/roboto-latin-900.870c8c1486f76054301a.woff2",
     "index.html": "/baskin-client/index.html",
-    "main.b667bd7d.css.map": "/baskin-client/static/css/main.b667bd7d.css.map",
-    "main.7244858a.js.map": "/baskin-client/static/js/main.7244858a.js.map",
+    "main.a67deceb.css.map": "/baskin-client/static/css/main.a67deceb.css.map",
+    "main.45259cac.js.map": "/baskin-client/static/js/main.45259cac.js.map",
     "983.b890c8ee.chunk.js.map": "/baskin-client/static/js/983.b890c8ee.chunk.js.map",
     "753.70fbc3bc.chunk.js.map": "/baskin-client/static/js/753.70fbc3bc.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b667bd7d.css",
-    "static/js/main.7244858a.js"
+    "static/css/main.a67deceb.css",
+    "static/js/main.45259cac.js"
   ]
 }
