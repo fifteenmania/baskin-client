@@ -20,7 +20,7 @@ export default function Multiplay() {
         return () => socket.close();
     }, [])**/
     return <div> 
-        멀티플레이 메뉴입니다. 구현 예정입니다.
+        서버에 접속하여 다른 사람과 플레이합니다. 구현 예정입니다.
         <div>
         </div>
     </div>

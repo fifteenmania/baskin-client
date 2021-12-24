@@ -7,6 +7,7 @@ import Multiplay from '../feature/multiPlay/Multiplay';
 import 'typeface-roboto';
 import './style.css';
 import Footer from './Footer';
+import HotSheet from '../feature/hotSheet/HotSheet';
 
 function Title() {
   return <Typography variant='h3' component="h3">
@@ -23,6 +24,7 @@ function MainTab() {
     <Tabs value={tabId} onChange={handleTabChange}>
       <Tab label="승률 계산기" value="calculator"/>
       <Tab label="싱글 플레이" value="single-play"/>
+      <Tab label="핫시트 플레이" value="hotsheet"/>
       <Tab label="멀티 플레이" value="multi-play"/>
     </Tabs>
     <TabPanel value={tabId} index={"calculator"}>
@@ -30,6 +32,9 @@ function MainTab() {
     </TabPanel>
     <TabPanel value={tabId} index={"single-play"}>
       <SinglePlay />
+    </TabPanel>
+    <TabPanel value={tabId} index={"hotsheet"}>
+      <HotSheet />
     </TabPanel>
     <TabPanel value={tabId} index={"multi-play"}>
       <Multiplay/>

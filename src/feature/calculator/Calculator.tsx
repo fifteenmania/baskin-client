@@ -1,6 +1,6 @@
 import { Box, Divider, TextField } from "@mui/material";
 import { lazy, Suspense, useState } from "react";
-import TabDescription from "../common/TabDescription";
+import TabDescription from "component/TabDescription";
 import ChartSuspense from "./ChartSuspense";
 const ChartBox = lazy(() => import("./Chart"));
 
@@ -13,7 +13,7 @@ function Calculator() {
 
     const width = 600;
     const height = 600;
-    
+
     return <div>
         <TabDescription>
             숫자에 따른 이론적 승률을 계산해서 보여줍니다.
