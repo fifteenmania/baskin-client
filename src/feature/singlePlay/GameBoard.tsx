@@ -72,15 +72,10 @@ function NumberTable(props: {
     const {playLog, playerTurn, numPlayer, uiStatus, setUiStatus} = props;
     // wait until animation finished.
     useEffect(() => {
-        const delay = Math.random()*1000 + 300
         if (uiStatus !== UiStatus.inputAccepted) {
             return
         }
-        if (playerTurn === getCurrentPlayer(playLog, numPlayer)) {
-            setUiStatus(UiStatus.turnStart)
-            return;
-        }
-        setTimeout(() => setUiStatus(UiStatus.turnStart), delay);
+        setUiStatus(UiStatus.turnStart)
     }, [uiStatus, setUiStatus, numPlayer, playLog, playerTurn])
     return <table className="number-table">
         <thead>
@@ -186,16 +181,20 @@ export function GameBoard(props: {
     }, [uiStatus, playLog, numPlayer, numEnd, playerTurn])
 
     // Handle Ai turn.
+    // Delay is inserted for better play experience.
     useEffect(() => {
         if (uiStatus !== UiStatus.beforeAiInput) {
             return;
         }
-        setPlayLog((prevPlayLog) => {
-            const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
-            const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
-            const newPlayLog = prevPlayLog.concat(newPlayLogElement);
-            return newPlayLog
-        })
+        const delay = Math.random() * 1000 + 200;
+        setTimeout(() => {
+            setPlayLog((prevPlayLog) => {
+                const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
+                const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
+                const newPlayLog = prevPlayLog.concat(newPlayLogElement);
+                return newPlayLog
+            })
+        }, delay)
         return;
     }, [uiStatus, maxCall, numEnd, loseMat, numPlayer, playerTurn])
 
