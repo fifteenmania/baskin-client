@@ -2,7 +2,7 @@ import { Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { AnimationEventHandler, useState } from "react";
 import { HotSheetSetting } from "./HotSheet";
-import { getCurrentNum, getCurrentPlayer, makePlayLogEntry, PlayLog, PlayLogEntry } from "baskin-lib";
+import { getCurrentNum, getCurrentPlayer, getLastPlayer, makePlayLogEntry, PlayLog, PlayLogEntry } from "baskin-lib";
 import { handleNumberStateChange } from "feature/common/reactUtil";
 import { useEffect } from "react";
 import { Dispatch } from "react";
@@ -83,6 +83,15 @@ export default function HotSheetBoard(props: {setting: HotSheetSetting}) {
         });
     }
 
+    const printGameOver = (playLog: PlayLog) => {
+        const lastPlayer = getLastPlayer(playLog);
+        if (lastPlayer === undefined) {
+            alert("Invalid game setting. Change game settings.")
+            return
+        }
+        alert(`player ${lastPlayer+1} lose`)
+    }
+
     useEffect(() => {
         if (uiStatus !== UiStatus.turnStart) {
             return;
@@ -90,6 +99,7 @@ export default function HotSheetBoard(props: {setting: HotSheetSetting}) {
         const currentNum = getCurrentNum(playLog);
         if (currentNum >= numEnd) {
             setUiStatus(UiStatus.gameOver);
+            printGameOver(playLog)
             return;
         }
         setUiStatus(UiStatus.waitingHumanInput);
