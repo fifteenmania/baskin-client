@@ -1,6 +1,7 @@
 import { Button, MenuItem, TextField, FormControl, Divider, Box } from "@mui/material";
 import { useState } from "react";
 import { handleNumberSelectChange, handleNumberStateChange } from "../common/reactUtil";
+import TabDescription from "../common/TabDescription";
 import { GameBoard, BoardSetting }  from "./GameBoard";
 import './style.css'
 
@@ -24,6 +25,10 @@ function SinglePlay() {
     }
 
     return <div>
+        <TabDescription>
+            인공지능과 플레이합니다. 
+            인공지능은 매 턴 최적 전략을 구사합니다.
+        </TabDescription> 
         <Box>
             <Box>
                 <TextField required 

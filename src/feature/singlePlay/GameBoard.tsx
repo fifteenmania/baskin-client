@@ -1,4 +1,4 @@
-import { Stack, TextField, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
+import { TextField, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
 import { AnimationEventHandler, Dispatch, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
@@ -44,8 +44,7 @@ enum UiStatus {
     gameOver, // gameover state.
 }
 
-function NumberNode( 
-    props : {
+function NumberRow(props : {
         log : PlayLogEntry, 
         playerTurn : number,
         onAnimationEnd: AnimationEventHandler<HTMLDivElement>
@@ -53,13 +52,17 @@ function NumberNode(
     const {log, playerTurn, onAnimationEnd} = props;
     const {player, lastCall} = log;
     const msg = (playerTurn===player) ? "나                " : `플레이어 ${player+1}`;
-    return <div className="number-node" onAnimationEnd={onAnimationEnd}>
-        <span className="number-node-text">
-            <strong>{msg}</strong>{`: ${lastCall}`}</span>
-    </div>
+    return <tr className="number-row" onAnimationEnd={onAnimationEnd}>
+        <td className="number-row-player">
+            {msg}
+        </td>
+        <td className="number-row-number">
+            {lastCall}
+        </td>
+    </tr>
 }
 
-function NumberTree(props: {
+function NumberTable(props: {
         playLog : PlayLog, 
         playerTurn : number,
         uiStatus: UiStatus,
@@ -71,9 +74,17 @@ function NumberTree(props: {
             setUiStatus(UiStatus.turnStart);
         }
     }, [uiStatus, setUiStatus])
-    return <Stack direction={{xs: "column-reverse"}}>
-        {playLog.map((item, idx) => <NumberNode key={idx} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
-    </Stack>
+    return <table className="number-table">
+        <thead>
+            <tr>
+                <th className="number-row-player">플레이어</th>
+                <th className="number-row-number">마지막 말한 숫자</th>
+            </tr>
+        </thead>
+        <tbody>
+            {playLog.map((item, idx) => <NumberRow key={idx} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
+        </tbody>
+    </table>
 }
 
 function getWinRate(loseMatrix: number[][], pickedNumber: number) {
@@ -242,7 +253,7 @@ export function GameBoard(props: {
             showWinRate={showWinRate}
         />
         <Box sx={{p: 3, maxWidth: "30rem"}}>
-            <NumberTree playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
+            <NumberTable playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
         </Box>
     </Box>
 }
