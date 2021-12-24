@@ -50,7 +50,7 @@ function NumberTable(props: {
             </tr>
         </thead>
         <tbody>
-            {playLog.map((item, idx) => <NumberRow key={idx} log={item} onAnimationEnd={() => {}}/>)}
+            {playLog.slice().reverse().map((item) => <NumberRow key={item.lastCall} log={item} onAnimationEnd={() => {}}/>)}
         </tbody>
     </table>
 }
@@ -67,7 +67,8 @@ function PickedNumber(props: {
 }
 
 export default function HotSheetBoard(props: {setting: HotSheetSetting}) { 
-    const {numEnd, numPlayer, maxCall} = props.setting;
+    const {setting} = props;
+    const {numEnd, numPlayer, maxCall} = setting;
     const [numCall, setNumCall] = useState(1);
     const [playLog, setPlayLog] = useState<PlayLog>([]);
     // act as global lock for ui
@@ -91,6 +92,11 @@ export default function HotSheetBoard(props: {setting: HotSheetSetting}) {
         }
         alert(`player ${lastPlayer+1} lose`)
     }
+
+    // reset when game settings change.
+    useEffect(() => {
+        reset();
+    }, [setting])
 
     useEffect(() => {
         if (uiStatus !== UiStatus.turnStart) {

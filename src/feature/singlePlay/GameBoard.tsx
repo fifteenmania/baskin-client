@@ -65,15 +65,23 @@ function NumberRow(props : {
 function NumberTable(props: {
         playLog : PlayLog, 
         playerTurn : number,
+        numPlayer: number,
         uiStatus: UiStatus,
         setUiStatus: Dispatch<UiStatus>
     }) {
-    const {playLog, playerTurn, uiStatus, setUiStatus} = props;
+    const {playLog, playerTurn, numPlayer, uiStatus, setUiStatus} = props;
+    // wait until animation finished.
     useEffect(() => {
-        if (uiStatus === UiStatus.inputAccepted) {
-            setUiStatus(UiStatus.turnStart);
+        const delay = Math.random()*1000 + 300
+        if (uiStatus !== UiStatus.inputAccepted) {
+            return
         }
-    }, [uiStatus, setUiStatus])
+        if (playerTurn === getCurrentPlayer(playLog, numPlayer)) {
+            setUiStatus(UiStatus.turnStart)
+            return;
+        }
+        setTimeout(() => setUiStatus(UiStatus.turnStart), delay);
+    }, [uiStatus, setUiStatus, numPlayer, playLog, playerTurn])
     return <table className="number-table">
         <thead>
             <tr>
@@ -82,7 +90,7 @@ function NumberTable(props: {
             </tr>
         </thead>
         <tbody>
-            {playLog.map((item, idx) => <NumberRow key={idx} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
+            {playLog.slice().reverse().map((item) => <NumberRow key={item.lastCall} log={item} playerTurn={playerTurn} onAnimationEnd={() => {}}/>)}
         </tbody>
     </table>
 }
@@ -244,7 +252,7 @@ export function GameBoard(props: {
                 value={numCall} 
                 onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
             />
-            <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
+            <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver || uiStatus !== UiStatus.waitingHumanInput}>말하기</Button>
             <Button onClick={reset}>재시작</Button>
         </div>
         <PickedNumber 
@@ -253,7 +261,7 @@ export function GameBoard(props: {
             showWinRate={showWinRate}
         />
         <Box sx={{p: 3, maxWidth: "30rem"}}>
-            <NumberTable playLog={playLog} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
+            <NumberTable playLog={playLog} numPlayer={numPlayer} playerTurn={playerTurn} uiStatus={uiStatus} setUiStatus={setUiStatus}/>
         </Box>
     </Box>
 }
