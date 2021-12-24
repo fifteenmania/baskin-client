@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react"
 
+/**
 function ipIsValid(ip: string): boolean {
     const ipValidator=/^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
     const match = ipValidator.exec(ip);
     return !!match
-}
+} */
 
 export default function Multiplay() {
+    /**
     const [connectionStatus, setConnectionStatus] = useState<string>("before connection");
     const serverAddress = "ws://localhost:8080"
     useEffect(() => {
@@ -17,11 +18,10 @@ export default function Multiplay() {
             socket.send("Hello world!")
         }
         return () => socket.close();
-    }, [])
+    }, [])**/
     return <div> 
-        멀티플레이 메뉴입니다. 구현 예정입니다.
+        서버에 접속하여 다른 사람과 플레이합니다. 구현 예정입니다.
         <div>
-            {` 연결 상태: ${connectionStatus}`}
         </div>
     </div>
 }

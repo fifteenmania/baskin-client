@@ -1,5 +1,6 @@
 import { Box, Divider, TextField } from "@mui/material";
 import { lazy, Suspense, useState } from "react";
+import TabDescription from "component/TabDescription";
 import ChartSuspense from "./ChartSuspense";
 const ChartBox = lazy(() => import("./Chart"));
 
@@ -14,6 +15,9 @@ function Calculator() {
     const height = 600;
 
     return <div>
+        <TabDescription>
+            숫자에 따른 이론적 승률을 계산해서 보여줍니다.
+        </TabDescription> 
         <Box sx={{paddingBottom: "2.5rem"}}>
             <TextField required id="num-player" label="인원수" type="number" value={numPlayer} onChange={(event) => setNumPlayer(parseEvent(event))}/>
             <TextField required id="max-call" label="최대 말하는 갯수" type="number" value={maxCall} onChange={(event) => setMaxCall(parseEvent(event))}/>

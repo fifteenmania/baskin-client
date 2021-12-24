@@ -1,4 +1,4 @@
-@keyframes slide-in-from-bottom {
+@keyframes slide-in-from-top {
     0% {
         transform: translateY(-100%);
     }
@@ -7,12 +7,22 @@
     }
 }
 
-.number-node {
-    padding-left: 3px;
-    border: solid 1px #808080;
-    animation: 0.2s ease-in 0s slide-in-from-bottom;
+.number-table {
+    border-collapse: collapse;
 }
 
-.number-node-text {
-    white-space: pre-wrap;
+.number-row {
+    padding-left: 3px;
+    animation: 0.16s ease-in 0s slide-in-from-top;
+    border-bottom: 1px solid #444444;
+    padding: 1rem;
+    border-collapse: collapse;
+}
+
+.number-row-player {
+    width: 6rem;
+}
+
+.number-row-number {
+    width: 7rem;
 }
