@@ -1,4 +1,4 @@
-import { TextField, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
+import { TextField, Button, Box, Checkbox, FormControlLabel, Tooltip } from "@mui/material"
 import { AnimationEventHandler, Dispatch, KeyboardEventHandler, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
@@ -239,7 +239,7 @@ export function GameBoard(props: {
     }, [uiStatus, autoRestart])
 
     return <Box sx={{p: 3}}>
-        <div>
+        <div className="option-control-container">
             <FormControlLabel 
                 control={<Checkbox
                     value={autoRestart}
@@ -255,16 +255,19 @@ export function GameBoard(props: {
                 label="예상 승률 보이기"
             ></FormControlLabel>
         </div>
-        <div>
-            <TextField required 
-                id="num-call" 
-                label="몇 개 말할까" 
-                type="number" 
-                value={numCall} 
-                onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
-                onKeyDown={handleHotkey}
-                onFocus={(event) => {event.target.select()}}
-            />
+        <div className="call-number-container">
+            <Tooltip title="상하 방향키로 조절, 엔터로 입력, r로 재시작할 수 있습니다."
+                placement="top">
+                <TextField required 
+                    id="num-call" 
+                    label="몇 개 말할까" 
+                    type="number" 
+                    value={numCall} 
+                    onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
+                    onKeyDown={handleHotkey}
+                    onFocus={(event) => {event.target.select()}}
+                />
+            </Tooltip>
             <Button 
                 onClick={handlePlayerCall} 
                 disabled={uiStatus !== UiStatus.waitingHumanInput}

@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, TextField, Tooltip } from "@mui/material";
 import { Box } from "@mui/system";
 import { AnimationEventHandler, useState } from "react";
 import { HotSheetSetting } from "./HotSheet";
@@ -153,13 +153,15 @@ export default function HotSheetBoard(props: {setting: HotSheetSetting}) {
             ></FormControlLabel>
         </div>
         <div>
-            <TextField required 
-                id="num-call" 
-                label="몇 개 말할까" 
-                type="number" 
-                value={numCall} 
-                onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
-            />
+            <Tooltip title="상하 방향키로 조절, 엔터로 입력, r로 재시작할 수 있습니다.">
+                <TextField required 
+                    id="num-call" 
+                    label="몇 개 말할까" 
+                    type="number" 
+                    value={numCall} 
+                    onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
+                />
+            </Tooltip>
             <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver}>말하기</Button>
             <Button onClick={reset}>재시작</Button>
         </div>
