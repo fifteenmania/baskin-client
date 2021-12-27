@@ -1,5 +1,5 @@
-import { TextField, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
-import { AnimationEventHandler, Dispatch, useEffect, useMemo, useState } from "react";
+import { TextField, Button, Box, Checkbox, FormControlLabel, Tooltip } from "@mui/material"
+import { AnimationEventHandler, Dispatch, KeyboardEventHandler, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
     handlePlayerTurn, 
@@ -72,15 +72,10 @@ function NumberTable(props: {
     const {playLog, playerTurn, numPlayer, uiStatus, setUiStatus} = props;
     // wait until animation finished.
     useEffect(() => {
-        const delay = Math.random()*1000 + 300
         if (uiStatus !== UiStatus.inputAccepted) {
             return
         }
-        if (playerTurn === getCurrentPlayer(playLog, numPlayer)) {
-            setUiStatus(UiStatus.turnStart)
-            return;
-        }
-        setTimeout(() => setUiStatus(UiStatus.turnStart), delay);
+        setUiStatus(UiStatus.turnStart)
     }, [uiStatus, setUiStatus, numPlayer, playLog, playerTurn])
     return <table className="number-table">
         <thead>
@@ -186,16 +181,20 @@ export function GameBoard(props: {
     }, [uiStatus, playLog, numPlayer, numEnd, playerTurn])
 
     // Handle Ai turn.
+    // Delay is inserted for better play experience.
     useEffect(() => {
         if (uiStatus !== UiStatus.beforeAiInput) {
             return;
         }
-        setPlayLog((prevPlayLog) => {
-            const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
-            const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
-            const newPlayLog = prevPlayLog.concat(newPlayLogElement);
-            return newPlayLog
-        })
+        const delay = Math.random() * 1000 + 200;
+        setTimeout(() => {
+            setPlayLog((prevPlayLog) => {
+                const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
+                const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
+                const newPlayLog = prevPlayLog.concat(newPlayLogElement);
+                return newPlayLog
+            })
+        }, delay)
         return;
     }, [uiStatus, maxCall, numEnd, loseMat, numPlayer, playerTurn])
 
@@ -206,6 +205,18 @@ export function GameBoard(props: {
         }
         const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
         setPlayLog(playerPlayLog);
+    }
+
+    const handleHotkey: KeyboardEventHandler<HTMLDivElement> = (event) => {
+        switch (event.key) {
+            case ("Enter") :
+                handlePlayerCall();
+                break;
+            case ("r") :
+                reset();
+                break;
+            default:
+        }
     }
     
     // After playLog updates, wait until animation end.
@@ -228,7 +239,7 @@ export function GameBoard(props: {
     }, [uiStatus, autoRestart])
 
     return <Box sx={{p: 3}}>
-        <div>
+        <div className="option-control-container">
             <FormControlLabel 
                 control={<Checkbox
                     value={autoRestart}
@@ -244,15 +255,23 @@ export function GameBoard(props: {
                 label="예상 승률 보이기"
             ></FormControlLabel>
         </div>
-        <div>
-            <TextField required 
-                id="num-call" 
-                label="몇 개 말할까" 
-                type="number" 
-                value={numCall} 
-                onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
-            />
-            <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver || uiStatus !== UiStatus.waitingHumanInput}>말하기</Button>
+        <div className="call-number-container">
+            <Tooltip title="상하 방향키로 조절, 엔터로 입력, r로 재시작할 수 있습니다."
+                placement="top">
+                <TextField required 
+                    id="num-call" 
+                    label="몇 개 말할까" 
+                    type="number" 
+                    value={numCall} 
+                    onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
+                    onKeyDown={handleHotkey}
+                    onFocus={(event) => {event.target.select()}}
+                />
+            </Tooltip>
+            <Button 
+                onClick={handlePlayerCall} 
+                disabled={uiStatus !== UiStatus.waitingHumanInput}
+            >말하기</Button>
             <Button onClick={reset}>재시작</Button>
         </div>
         <PickedNumber 
