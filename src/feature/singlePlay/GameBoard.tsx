@@ -1,5 +1,5 @@
 import { TextField, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
-import { AnimationEventHandler, Dispatch, useEffect, useMemo, useState } from "react";
+import { AnimationEventHandler, Dispatch, KeyboardEventHandler, useEffect, useMemo, useState } from "react";
 import { getLastPlayer, 
     getFullLoseProbMat, 
     handlePlayerTurn, 
@@ -206,6 +206,18 @@ export function GameBoard(props: {
         const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
         setPlayLog(playerPlayLog);
     }
+
+    const handleHotkey: KeyboardEventHandler<HTMLDivElement> = (event) => {
+        switch (event.key) {
+            case ("Enter") :
+                handlePlayerCall();
+                break;
+            case ("r") :
+                reset();
+                break;
+            default:
+        }
+    }
     
     // After playLog updates, wait until animation end.
     useEffect(() => {
@@ -250,8 +262,13 @@ export function GameBoard(props: {
                 type="number" 
                 value={numCall} 
                 onChange={(event) => handleNumberStateChange(event, setNumCall, {maxVal: maxCall, minVal: 1})}
+                onKeyDown={handleHotkey}
+                onFocus={(event) => {event.target.select()}}
             />
-            <Button onClick={handlePlayerCall} disabled={uiStatus===UiStatus.gameOver || uiStatus !== UiStatus.waitingHumanInput}>말하기</Button>
+            <Button 
+                onClick={handlePlayerCall} 
+                disabled={uiStatus !== UiStatus.waitingHumanInput}
+            >말하기</Button>
             <Button onClick={reset}>재시작</Button>
         </div>
         <PickedNumber 
