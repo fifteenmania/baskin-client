@@ -22,10 +22,10 @@ function MainTab() {
   }
   return <div>
     <Tabs value={tabId} onChange={handleTabChange}>
-      <Tab label="승률 계산기" value="calculator"/>
       <Tab label="싱글 플레이" value="single-play"/>
       <Tab label="핫시트 플레이" value="hotsheet"/>
       <Tab label="멀티 플레이" value="multi-play"/>
+      <Tab label="승률 계산기" value="calculator"/>
     </Tabs>
     <TabPanel value={tabId} index={"calculator"}>
       <Calculator />
