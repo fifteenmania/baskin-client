@@ -16,7 +16,7 @@ function Title() {
 }
 
 function MainTab() {
-  const [tabId, setTabId] = useState("calculator");
+  const [tabId, setTabId] = useState("single-play");
   const handleTabChange = (_: React.SyntheticEvent, newTabId: string) => {
     setTabId(newTabId);
   }
