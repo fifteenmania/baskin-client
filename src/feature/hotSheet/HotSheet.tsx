@@ -38,19 +38,25 @@ export default function HotSheet() {
                     label="인원수" 
                     type="number" 
                     value={numPlayer} 
-                    onChange={(event) => handleNumberStateChange(event, setNumPlayer, {minVal: 1, maxVal:1000})}/>
+                    onChange={(event) => handleNumberStateChange(event, setNumPlayer, {minVal: 1, maxVal:1000})}
+                    onFocus={(event) => (event.target.select())}
+                />
                 <TextField required 
                     id="num-count" 
                     label="최대 말하는 갯수" 
                     type="number" 
                     value={maxCall} 
-                    onChange={(event) => handleNumberStateChange(event, setMaxCall, {minVal: 1, maxVal: 1000})}/>
+                    onChange={(event) => handleNumberStateChange(event, setMaxCall, {minVal: 1, maxVal: numEnd})}
+                    onFocus={(event) => (event.target.select())}
+                />
                 <TextField required 
                     id="num-end" 
                     label="마지막 숫자" 
                     type="number" 
                     value={numEnd} 
-                    onChange={(event) => handleNumberStateChange(event, setNumEnd, {minVal: 1, maxVal: 1000})}/>
+                    onChange={(event) => handleNumberStateChange(event, setNumEnd, {minVal: 1, maxVal: 3000})}
+                    onFocus={(event) => (event.target.select())}
+                />
             </Box>
             <Button onClick={handleClick}>{started? "설정 반영하여 재시작": "게임 시작"}</Button>
             <Divider variant="middle"/>

@@ -133,11 +133,9 @@ export function GameBoard(props: {
 
     const reset = () => {
         console.log("reset")
-        setUiStatus(() => {
-            setPlayLog([]);
-            setNumCall(1);
-            return UiStatus.turnStart
-        });
+        setPlayLog([]);
+        setNumCall(1);
+        setUiStatus(UiStatus.turnStart);
     }
 
     const printGameOver = (playLog: PlayLog, playerTurn: number) => {
