@@ -8,6 +8,7 @@ import 'typeface-roboto';
 import './style.css';
 import Footer from './Footer';
 import HotSheet from '../feature/hotSheet/HotSheet';
+import { Betting } from 'feature/betting/Betting';
 
 function Title() {
   return <Typography variant='h3' component="h3">
@@ -22,11 +23,15 @@ function MainTab() {
   }
   return <div>
     <Tabs value={tabId} onChange={handleTabChange}>
+      <Tab label="싱글 플레이(베팅)" value="betting"/>
       <Tab label="싱글 플레이" value="single-play"/>
       <Tab label="핫시트 플레이" value="hotsheet"/>
       <Tab label="멀티 플레이" value="multi-play"/>
       <Tab label="승률 계산기" value="calculator"/>
     </Tabs>
+    <TabPanel value={tabId} index={"betting"} >
+      <Betting />
+    </TabPanel>
     <TabPanel value={tabId} index={"calculator"}>
       <Calculator />
     </TabPanel>
