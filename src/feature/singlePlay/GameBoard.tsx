@@ -184,17 +184,22 @@ export function GameBoard(props: {
         if (uiStatus !== UiStatus.beforeAiInput) {
             return;
         }
-        const delay = Math.random() * 1000 + 200;
+        const delay = Math.random() * 800 + 200;
         setTimeout(() => {
             setPlayLog((prevPlayLog) => {
-                const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
-                const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
-                const newPlayLog = prevPlayLog.concat(newPlayLogElement);
-                return newPlayLog
+                if (playLog === prevPlayLog) {
+                    const currentPlayer = getCurrentPlayer(prevPlayLog, numPlayer);
+                    const newPlayLogElement = handleAiTurnOnce(loseMat, prevPlayLog, maxCall, numEnd, currentPlayer);
+                    const newPlayLog = prevPlayLog.concat(newPlayLogElement);
+                    setUiStatus(UiStatus.inputAccepted);
+                    return newPlayLog
+                } else {
+                    return prevPlayLog
+                }
             })
         }, delay)
         return;
-    }, [uiStatus, maxCall, numEnd, loseMat, numPlayer, playerTurn])
+    }, [uiStatus, playLog, maxCall, numEnd, loseMat, numPlayer, playerTurn])
 
     // Handle user input
     const handlePlayerCall = () => {
@@ -203,6 +208,7 @@ export function GameBoard(props: {
         }
         const playerPlayLog = handlePlayerTurn(playLog, numCall, numEnd, playerTurn);
         setPlayLog(playerPlayLog);
+        setUiStatus(UiStatus.inputAccepted);
     }
 
     const handleHotkey: KeyboardEventHandler<HTMLDivElement> = (event) => {
@@ -216,15 +222,6 @@ export function GameBoard(props: {
             default:
         }
     }
-    
-    // After playLog updates, wait until animation end.
-    useEffect(() => {
-        if (playLog.length === 0) {
-            return;
-        }
-        console.log("input accepted, waiting animation")
-        setUiStatus(UiStatus.inputAccepted);
-    }, [playLog])
 
     // If auto-restart, reset after gameOver.
     useEffect(() => {
